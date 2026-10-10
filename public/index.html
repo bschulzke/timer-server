@@ -117,6 +117,15 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
 .file{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
 .file:focus-visible + label{outline:2px solid var(--amber);outline-offset:2px}
 .hint{margin:0;font-size:13px;color:var(--line);max-width:62ch}
+.tog{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;cursor:pointer;font:700 13px/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--paper)}
+.tog input{width:20px;height:20px;margin:0;accent-color:var(--amber)}
+.tog small{display:block;margin-top:4px;font:400 13px/1.4 var(--sans,system-ui,sans-serif);letter-spacing:0;text-transform:none;color:var(--line)}
+.tog:has(input:disabled){opacity:.5;cursor:default}
+.snd-dj{display:grid;gap:10px;padding-bottom:12px;border-bottom:1px solid var(--line-dim)}
+.snd-dj p{margin:0;font-size:14px;line-height:1.45;color:var(--paper)}
+.snd-dj .btn{justify-self:start}
+.credit{font-size:11px;opacity:.85}
+.btn.attn{border-color:var(--amber);color:var(--amber)}
 
 /* start screen */
 .landing{display:grid;align-content:center;justify-items:center;gap:26px;padding-block:16px;min-width:0}
@@ -355,6 +364,15 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
         </div>
         <p class="hint" id="bg-hint"></p>
       </section>
+      <section class="panel" id="panel-sound" hidden>
+        <div class="panel-head"><h2>Sound</h2><button class="panel-x" data-close aria-label="Close sound settings">×</button></div>
+        <div class="snd-dj" id="snd-dj" aria-live="polite"></div>
+        <label class="tog" for="snd-music"><input type="checkbox" id="snd-music"><span>Music<small>Plays only on the music device. Cool Vibes between loops, a new track each loop.</small></span></label>
+        <div class="row snd-vol"><label for="snd-vol">Music volume</label><input type="range" id="snd-vol" min="0" max="100" step="1" value="70"></div>
+        <label class="tog" for="snd-effect"><input type="checkbox" id="snd-effect"><span>Final-minutes effect<small>In the last three minutes the music speeds up and a clock ticks. Both pick up again in the last minute.</small></span></label>
+        <label class="tog" for="snd-chimes"><input type="checkbox" id="snd-chimes"><span>Alarm and chimes on this device<small>The alarm when a loop ends, and a chime two minutes before each timestamp comes back around.</small></span></label>
+        <p class="hint credit">Music by Kevin MacLeod (incompetech.com): “Cool Vibes”, “Covert Affair”, “Spy Glass”, “Fast Talkin”, “Bossa Antigua”. Licensed under Creative Commons: By Attribution 4.0, creativecommons.org/licenses/by/4.0/</p>
+      </section>
       <section class="panel" id="panel-mark" role="dialog" aria-modal="true" aria-labelledby="mk-title" hidden>
         <div class="panel-head"><h2 id="mk-title">New timestamp</h2><button class="panel-x" data-close aria-label="Discard and close">×</button></div>
         <form class="mk" id="mk-form" novalidate>
@@ -375,7 +393,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     <div class="tools">
       <button class="btn small" id="btn-share" aria-expanded="false" aria-controls="panel-share">Share game</button>
       <button class="btn small" id="btn-bg" aria-expanded="false" aria-controls="panel-bg">Backdrop</button>
-      <button class="btn small" id="btn-sound" aria-pressed="true">Sound on</button>
+      <button class="btn small" id="btn-sound" aria-expanded="false" aria-controls="panel-sound">Sound</button>
       <button class="btn small" id="btn-full">Full screen</button>
     </div>
   </div>
@@ -389,7 +407,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   var HOUR = 3600, KEY = 'shenan-timer-v1', C = 2 * Math.PI * 176, GRACE = 30000;
   var SHARE_URL = 'https://claude.ai/artifact/Ezgp29R9uCECGqWPBxJXAZ';
   var PHASES = ['ready', 'running', 'paused', 'caught', 'won'];
-  var GAME_KEYS = ['loop', 'phase', 'remaining', 'deadline', 'speed', 'won', 'bg', 'hostId', 'origHost', 'rev'];
+  var GAME_KEYS = ['loop', 'phase', 'remaining', 'deadline', 'speed', 'won', 'bg', 'hostId', 'origHost', 'rev', 'dj'];
   var $ = function(id){ return document.getElementById(id); };
   var BGS = [
     {id:'grid',   name:'Blank sheet'},
@@ -427,6 +445,11 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
       },
       writeMark: function(code, m){ return db.doc('games/' + code + '/marks/' + m.id).set({t:m.t, loop:m.loop, note:m.note}); },
       deleteMark: function(code, id){ return db.doc('games/' + code + '/marks/' + id).delete(); },
+      // Make this device the one that plays the music.
+      setDj: function(code, me){
+        var ref = db.doc('games/' + code);
+        return ref.get().then(function(s){ if (s.exists) return ref.set(Object.assign({}, s.data(), {dj: me})); });
+      },
       // Who has this game open right now. cb(list of device ids, or null when this view can't tell).
       // Resolves {leave()} or null when presence isn't available.
       presence: function(code, me, cb){
@@ -520,6 +543,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
       },
       writeMark: function(code, m){ return send({op:'wmark', code:code, id:m.id, mark:{t:m.t, loop:m.loop, note:m.note}}); },
       deleteMark: function(code, id){ return send({op:'dmark', code:code, id:id}); },
+      setDj: function(code){ return send({op:'dj', code:code}); },
       presence: function(code, me, cb){
         joined[code] = true; add(peerCbs, code, cb);
         return send({op:'join', code:code}).then(function(){
@@ -538,7 +562,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   function clampInt(v, lo, hi, d){ v = Math.round(+v); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; }
   function fresh(){
     return {loop:1, phase:'ready', remaining:HOUR*1000, deadline:null, speed:1, won:null, bg:'vault',
-            hostId:null, origHost:null, rev:0, marks:[]};
+            hostId:null, origHost:null, rev:0, dj:null, marks:[]};
   }
   // Everything read from storage or from other devices goes through these two.
   function cleanGame(g){
@@ -554,6 +578,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     o.hostId = typeof g.hostId === 'string' ? g.hostId.slice(0, 40) : null;
     o.origHost = typeof g.origHost === 'string' ? g.origHost.slice(0, 40) : null;
     o.rev = typeof g.rev === 'number' && isFinite(g.rev) ? g.rev : 0;
+    o.dj = typeof g.dj === 'string' ? g.dj.slice(0, 40) : null;
     return o;
   }
   function cleanMark(m){
@@ -564,7 +589,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   }
   function normalize(o){
     var s = Object.assign(fresh(), cleanGame(o));
-    s.hostId = null; s.origHost = null;
+    s.hostId = null; s.origHost = null; s.dj = null;
     s.marks = (Array.isArray(o.marks) ? o.marks : []).map(cleanMark).filter(Boolean);
     return s;
   }
@@ -590,14 +615,13 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   }
   function saveLocal(){ if (net.code || P.mode !== 'solo') return; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
   function loadPrefs(){
-    var p = {sound:true, strength:40, useCustom:false, code:null, mode:null};
+    var p = {music:true, vol:70, effect:true, chimes:null, strength:40, useCustom:false, code:null, mode:null};
     try {
       var raw = localStorage.getItem(KEY + '-prefs');
       if (raw) Object.assign(p, JSON.parse(raw));
       else {
         var old = JSON.parse(localStorage.getItem(KEY) || 'null');
         if (old) {
-          if (typeof old.sound === 'boolean') p.sound = old.sound;
           if (typeof old.strength === 'number') p.strength = old.strength;
           if (old.bg === 'custom') p.useCustom = true;
         }
@@ -612,7 +636,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     return p;
   }
   function savePrefs(){
-    try { localStorage.setItem(KEY + '-prefs', JSON.stringify({sound:P.sound, strength:P.strength, useCustom:P.useCustom, code:P.code, mode:P.mode})); } catch(e){}
+    try { localStorage.setItem(KEY + '-prefs', JSON.stringify({music:P.music, vol:P.vol, effect:P.effect, chimes:P.chimes, strength:P.strength, useCustom:P.useCustom, code:P.code, mode:P.mode})); } catch(e){}
   }
 
   function pad(n){ return (n < 10 ? '0' : '') + n; }
@@ -719,6 +743,8 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     if (!net.code) return;
     if (!g) { if (!provisional && net.synced) leaveGame('That game no longer exists.'); return; }
     var next = cleanGame(g);
+    // The music device changes without a new rev, so always take it from the latest copy.
+    if (net.synced && next.dj !== S.dj) { S.dj = next.dj; renderSound(); }
     if (net.synced && next.rev < S.rev) return;                                   // an older write arriving late
     if (net.synced && next.rev === S.rev && next.hostId === S.hostId && S.hostId === P.device) {   // our own echo
       if (net.status !== 'live') { net.status = 'live'; render(); }                                   // ...which also means the connection is back
@@ -767,7 +793,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     net.subs.push(net.t.watchMarks(code, applyMarks, subFail));
     net.t.presence(code, P.device, function(list){
       if (net.code !== code) return;
-      net.peers = list; evalHost(); renderChip(); renderShare();
+      net.peers = list; evalHost(); renderChip(); renderShare(); renderSound();
     }).then(function(h){
       if (net.code !== code) { if (h) h.leave(); return; }
       net.room = h;
@@ -783,7 +809,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     var code = makeCode();
     net.t.readGame(code).then(function(existing){
       if (existing) return hostGame(true);                   // code already in use, pick another
-      S.hostId = P.device; S.origHost = P.device; S.rev = (S.rev || 0) + 1;
+      S.hostId = P.device; S.origHost = P.device; S.dj = P.device; S.rev = (S.rev || 0) + 1;
       var marks = S.marks.slice();
       return net.t.writeGame(code, gameDoc())
         .then(function(){ return Promise.all(marks.map(function(m){ return net.t.writeMark(code, m); })); })
@@ -873,7 +899,6 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     } catch(e){}
   }
   function audio(){
-    if (!P.sound) return null;
     unlockAudio();
     try {
       ac = ac || new (window.AudioContext || window.webkitAudioContext)();
@@ -881,29 +906,243 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
       return ac;
     } catch(e){ return null; }
   }
-  function tone(freq, start, dur, type, gain){
+  function tone(freq, start, dur, type, gain, bend){
     var a = audio(); if (!a) return;
     var o = a.createOscillator(), g = a.createGain(), t = a.currentTime + start;
-    o.type = type; o.frequency.value = freq;
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (bend) o.frequency.linearRampToValueAtTime(freq * bend, t + dur);
     g.gain.setValueAtTime(0.0001, t);
     g.gain.linearRampToValueAtTime(gain, t + 0.02);
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     o.connect(g); g.connect(a.destination);
     o.start(t); o.stop(t + dur + 0.05);
   }
+  // Who hears what. The alarm and chimes follow this device's setting (on by default only on the music
+  // device). The won and caught stings are part of the soundtrack, so the music device plays them too.
+  function chimesOn(){ return P.chimes === null || P.chimes === undefined ? isDJ() : !!P.chimes; }
   function sfx(name){
+    var sting = name === 'won' || name === 'caught';
+    if (!(chimesOn() || (sting && isDJ() && P.music))) return;
     if (name === 'reset') {
       [523.25,659.25,783.99,1046.5].forEach(function(f,i){ tone(f, i*0.09, 1.6, 'sine', 0.16); });
       [0,0.5,1,1.5].forEach(function(t){ tone(1318.5, 1.2+t, 0.25, 'triangle', 0.14); tone(1046.5, 1.45+t, 0.25, 'triangle', 0.14); });
     } else if (name === 'caught') {
-      [[392,0,0.45],[370,0.5,0.45],[349,1,0.45],[311,1.5,1.3]].forEach(function(n){ tone(n[0], n[1], n[2], 'sawtooth', 0.1); });
+      // Sad trombone: three slides down, then a long, wobbling fall.
+      [[392,0,0.5],[370,0.55,0.5],[349,1.1,0.5]].forEach(function(n){ tone(n[0], n[1], n[2], 'sawtooth', 0.09, 0.97); });
+      for (var w = 0; w < 6; w++) tone(330 - w * 6, 1.7 + w * 0.22, 0.24, 'sawtooth', 0.08, 0.96);
     } else if (name === 'won') {
-      [523.25,659.25,783.99,1046.5,1318.5].forEach(function(f,i){ tone(f, i*0.11, i === 4 ? 1.4 : 0.3, 'triangle', 0.16); });
+      // Brass fanfare: a quick pickup, then a held major chord with a high top note.
+      [[392,0,0.14],[392,0.16,0.14],[392,0.32,0.14],[523.25,0.5,0.5],[466.16,1.02,0.22],[523.25,1.26,0.22]].forEach(function(n){
+        tone(n[0], n[1], n[2], 'sawtooth', 0.08); tone(n[0] * 2, n[1], n[2], 'triangle', 0.06);
+      });
+      [523.25,659.25,783.99,1046.5].forEach(function(f){ tone(f, 1.5, 2.2, 'sawtooth', 0.05); tone(f, 1.5, 2.2, 'triangle', 0.07); });
     } else if (name === 'soon') {
       tone(880, 0, 0.35, 'sine', 0.12); tone(1174.7, 0.16, 0.5, 'sine', 0.12);
     } else if (name === 'tick') {
       tone(1000, 0, 0.07, 'square', 0.05);
     }
+  }
+
+
+  /* ================= music =================
+     Only the music device plays it: the GM's by default, or whichever device last tapped "Play music here".
+     Cool Vibes plays whenever the clock isn't running. Each loop opens on the next track of the rotation and
+     moves through it as tracks end. In the last 3 minutes (and again in the last minute) the music speeds up
+     without changing pitch and a clock ticks. When a loop ends the music drops under the alarm, fades out,
+     and Cool Vibes fades back in. Getting out or getting caught plays a sting first. Pausing just turns it down. */
+  var TRACKS = {lobby: 'music/cool-vibes.mp3',
+                loop: ['music/covert-affair.mp3', 'music/spy-glass.mp3', 'music/fast-talkin.mp3', 'music/bossa-antigua.mp3']};
+  var RATE_3 = 1.08, RATE_1 = 1.15;
+  var M = {el:null, fade:null, vol:null, primed:false, on:false, mode:'', rot:0, src:'', seq:0, timers:[],
+           phase:null, loop:null, rate:1, rateTo:1, rateTimer:0, tickIdx:null, blocked:false};
+  if (TEST) window.__music = M;   // for automated tests (?test)
+
+  function djId(){ return S.dj || S.hostId; }
+  function isDJ(){ return !net.code || djId() === P.device; }
+  function musicWanted(){ return inGame() && isDJ() && !!P.music && (!net.code || net.synced); }   // keeps playing through a brief disconnect
+  function musicTicking(){ return M.on && P.effect && M.mode === 'loop'; }
+
+  function musicSetup(){
+    var a = audio(); if (!a) return false;
+    if (!M.el) {
+      try {
+        M.el = new Audio(); M.el.preload = 'auto'; M.el.setAttribute('playsinline', '');
+        M.el.preservesPitch = true; M.el.mozPreservesPitch = true; M.el.webkitPreservesPitch = true;
+        var node = a.createMediaElementSource(M.el);
+        M.fade = a.createGain(); M.vol = a.createGain();
+        M.fade.gain.value = 0; M.vol.gain.value = volLevel();
+        node.connect(M.fade); M.fade.connect(M.vol); M.vol.connect(a.destination);
+        M.el.addEventListener('ended', function(){
+          if (M.mode !== 'loop') return;
+          M.rot = (M.rot + 1) % TRACKS.loop.length;
+          playTrack(TRACKS.loop[M.rot], false, 1.2);
+        });
+      } catch(e){ M.el = null; return false; }
+    }
+    return true;
+  }
+  // Phones only let a page play audio it first started during a tap, so start it (silently) on the first one.
+  function musicPrime(){
+    if (!musicSetup() || M.primed) return;
+    M.primed = true;
+    if (M.on) return;
+    M.el.src = TRACKS.lobby; M.src = TRACKS.lobby;
+    var pr = M.el.play();
+    if (pr && pr.then) pr.then(function(){ if (!M.on) M.el.pause(); }, function(){ M.primed = false; });
+  }
+  function volLevel(){ var v = Math.max(0, Math.min(100, +P.vol || 0)) / 100; return v * v; }
+  function setVol(paused, dur){
+    if (!M.vol) return;
+    var g = M.vol.gain, t = ac.currentTime, to = volLevel() * (paused ? 0.25 : 1);
+    g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(to, t + (dur || 0.4));
+  }
+  function fadeTo(to, dur){
+    var g = M.fade.gain, t = ac.currentTime;
+    g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(to, t + Math.max(0.02, dur));
+  }
+  function later(sec, fn){
+    var seq = M.seq;
+    M.timers.push(setTimeout(function(){ if (seq === M.seq) fn(); }, sec * 1000));
+  }
+  function cancelLater(){ M.seq++; M.timers.forEach(clearTimeout); M.timers = []; }
+  function playTrack(src, loop, fadeIn){
+    M.el.loop = loop;
+    if (M.src !== src || M.el.ended) { M.el.src = src; M.src = src; }
+    setRate(1, true);
+    var pr = M.el.play();
+    if (pr && pr.catch) pr.catch(function(){ M.blocked = true; renderSound(); });
+    fadeTo(1, fadeIn);
+  }
+  function setRate(r, now){
+    M.rateTo = r; clearInterval(M.rateTimer);
+    if (now) { M.rate = r; if (M.el) M.el.playbackRate = r; return; }
+    var from = M.rate, i = 0;
+    M.rateTimer = setInterval(function(){
+      i++; M.rate = from + (r - from) * (i / 15);
+      if (M.el) M.el.playbackRate = M.rate;
+      if (i >= 15) clearInterval(M.rateTimer);
+    }, 100);
+  }
+  function startLobby(fadeIn){ M.mode = 'lobby'; playTrack(TRACKS.lobby, true, fadeIn); }
+  function startLoop(fadeIn){
+    M.mode = 'loop'; M.rot = (S.loop - 1) % TRACKS.loop.length;
+    playTrack(TRACKS.loop[M.rot], false, fadeIn);
+  }
+  function startFor(fadeIn){
+    if (S.phase === 'running' || S.phase === 'paused') startLoop(fadeIn); else startLobby(fadeIn);
+  }
+  function musicStart(){
+    if (!musicSetup()) return;
+    cancelLater(); M.on = true; M.blocked = false;
+    M.phase = S.phase; M.loop = S.loop;
+    setVol(S.phase === 'paused', 0.1);
+    startFor(2);
+  }
+  function musicStop(dur){
+    cancelLater(); M.on = false; M.mode = ''; M.phase = null;
+    if (!M.el) return;
+    fadeTo(0, dur);
+    later(dur + 0.05, function(){ M.el.pause(); });
+    setRate(1, true);
+  }
+  // The clock changed state: move the music along with it.
+  function musicTransition(fromPhase, fromLoop){
+    var to = S.phase, reset = S.loop > fromLoop && to === 'ready';
+    var wasRunning = fromPhase === 'running' || fromPhase === 'paused';
+    cancelLater();
+    if (reset && wasRunning) {
+      // Time's up: drop under the alarm, let it ring, fade out, then the between-loops track.
+      M.mode = 'lobby-pending'; setRate(1);
+      fadeTo(chimesOn() ? 0.2 : 1, 0.3);
+      later(chimesOn() ? 2.6 : 0.4, function(){ fadeTo(0, 2); });
+      later(chimesOn() ? 4.8 : 2.6, function(){ startLobby(2.5); });
+    } else if (to === 'caught' || to === 'won') {
+      // A sting plays (see sfx); clear the way for it, then back to the between-loops track.
+      M.mode = 'lobby-pending'; setRate(1);
+      fadeTo(0, 0.4);
+      later(to === 'won' ? 4.2 : 3.6, function(){ startLobby(3); });
+    } else if (to === 'running' && fromPhase === 'paused' && S.loop === fromLoop) {
+      // Resuming: the same track carries on.
+    } else if (to === 'running' || to === 'paused') {
+      if (M.mode === 'loop' && S.loop === fromLoop) return;
+      M.mode = 'loop-pending';
+      fadeTo(0, 1);
+      later(1.05, function(){ startLoop(1.5); });
+    } else {
+      if (M.mode === 'lobby') return;
+      M.mode = 'lobby-pending';
+      fadeTo(0, 1);
+      later(1.05, function(){ startLobby(2); });
+    }
+  }
+  // Runs ten times a second, from tick().
+  function musicSync(){
+    if (!musicWanted()) { if (M.on) { musicStop(1.2); renderSound(); } return; }
+    if (!M.el || !M.primed || !ac || ac.state !== 'running') { if (!M.blocked) { M.blocked = true; renderSound(); } return; }
+    if (!M.on) { musicStart(); renderSound(); return; }
+    if (S.phase !== M.phase || S.loop !== M.loop) {
+      var fp = M.phase, fl = M.loop;
+      M.phase = S.phase; M.loop = S.loop;
+      musicTransition(fp, fl);
+    }
+    setVolIfChanged();
+    finalMinutes();
+  }
+  var lastVolKey = '';
+  function setVolIfChanged(){
+    var key = P.vol + '|' + (S.phase === 'paused');
+    if (key !== lastVolKey) { lastVolKey = key; setVol(S.phase === 'paused'); }
+  }
+  // The last three minutes: faster music and a ticking clock, picking up again for the last minute.
+  function finalMinutes(){
+    var ms = remainingMs(), s = ms / 1000;
+    var on = M.mode === 'loop' && S.phase === 'running' && P.effect && ms > 0;
+    var r = !on ? 1 : s <= 60 ? RATE_1 : s <= 180 ? RATE_3 : 1;
+    if (r !== M.rateTo) setRate(r);
+    if (!on || s > 180 || S.speed !== 1) { M.tickIdx = null; return; }
+    var step = s <= 60 ? 500 : 1000, idx = Math.floor((ms - 1) / step), until = ms - idx * step;
+    if (idx !== M.tickIdx && until <= 250) { M.tickIdx = idx; clockTick(ac.currentTime + until / 1000, idx); }
+  }
+  // A soft woodblock tick-tock, under the music's volume control.
+  function clockTick(when, n){
+    var o = ac.createOscillator(), g = ac.createGain(), f = ac.createBiquadFilter(), peak = 0.35 * volLevel();
+    if (peak <= 0) return;
+    o.type = 'triangle'; o.frequency.value = n % 2 ? 1250 : 1650;
+    f.type = 'bandpass'; f.frequency.value = o.frequency.value; f.Q.value = 6;
+    g.gain.setValueAtTime(0.0001, when);
+    g.gain.exponentialRampToValueAtTime(peak, when + 0.004);
+    g.gain.exponentialRampToValueAtTime(0.0001, when + 0.06);
+    o.connect(f); f.connect(g); g.connect(ac.destination);
+    o.start(when); o.stop(when + 0.08);
+  }
+  // "Play music here".
+  function takeMusic(){
+    if (!net.code || !live() || net.readOnly) return;
+    musicPrime();
+    S.dj = P.device;
+    net.t.setDj(net.code, P.device).catch(writeFailed);
+    if (!P.music) { P.music = true; savePrefs(); }
+    renderSound(); musicSync();
+  }
+
+  function renderSound(){
+    var box = $('snd-dj'); if (!box) return;
+    var mine = isDJ(), h = '';
+    if (!net.code) h = '<p>Music plays on this device.</p>';
+    else if (mine) h = '<p>This device plays the music' + (S.hostId === P.device ? ', since you’re the GM' : '') + '. Connect it to your speaker, or tap “Play music here” on the device that is.</p>';
+    else {
+      var here = !!net.peers && net.peers.indexOf(djId()) >= 0;
+      h = '<p>' + (!here ? 'The device that was playing music isn’t connected.'
+                         : djId() === S.hostId ? 'The music plays on the GM’s device.' : 'The music plays on another device.') + '</p>' +
+          (live() && !net.readOnly ? '<button class="btn small" type="button" id="snd-take">Play music here</button>' : '');
+    }
+    if (mine && P.music && inGame() && M.blocked && !M.on) h += '<p class="hint">Tap anywhere to start the music.</p>';
+    if (h !== cache.snd) { box.innerHTML = h; cache.snd = h; }
+    $('snd-music').checked = !!P.music; $('snd-music').disabled = !mine;
+    $('snd-vol').value = P.vol; $('snd-vol').disabled = !mine;
+    $('snd-effect').checked = !!P.effect; $('snd-effect').disabled = !mine;
+    $('snd-chimes').checked = chimesOn();
+    $('btn-sound').classList.toggle('attn', mine && !!P.music && inGame() && M.blocked && !M.on);
   }
 
   /* ================= clock (GM only) ================= */
@@ -1038,7 +1277,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
         rows[i].classList.toggle('passed', on && t > s);
         rows[i].classList.toggle('soon', S.phase === 'running' && lp < S.loop && s - t > 0 && s - t <= 120);
       }
-      if (S.phase === 'running' && S.speed === 1 && s <= 10 && s > 0 && last.txt) sfx('tick');
+      if (S.phase === 'running' && S.speed === 1 && s <= 10 && s > 0 && last.txt && !musicTicking()) sfx('tick');
       last.txt = txt;
       if (takeoverOffered() !== last.offer) { render(); return; }
     }
@@ -1059,6 +1298,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     if (cap.id !== undefined && !alerted[cap.id]) { alerted[cap.id] = true; sfx('soon'); }
   }
   function tick(){
+    musicSync();
     if (!inGame()) return;
     if (S.phase === 'running' && remainingMs() <= 0 && canControl()) { endLoop(); return; }
     paint();
@@ -1141,8 +1381,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
       return '<path class="dialmark' + (m.loop < S.loop ? ' old' : '') + '" transform="rotate(' + ang + ')" d="M0-183L6-176L0-169L-6-176Z"><title>' + esc(fmt(m.t) + ' ' + m.note) + '</title></path>';
     }).join('');
 
-    $('btn-sound').textContent = P.sound ? 'Sound on' : 'Sound off';
-    $('btn-sound').setAttribute('aria-pressed', String(P.sound));
+    renderSound();
 
     $('bg-strength').value = P.strength;
     renderBg(); renderChip(); renderShare();
@@ -1333,7 +1572,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     P.strength = +e.target.value; document.documentElement.style.setProperty('--bg-strength', Math.max(12, P.strength) / 100); savePrefs();
   });
 
-  var PANELS = [['btn-share','panel-share'], ['btn-bg','panel-bg']];
+  var PANELS = [['btn-share','panel-share'], ['btn-bg','panel-bg'], ['btn-sound','panel-sound']];
   function togglePanel(panel){
     var open = $(panel).hidden;
     PANELS.forEach(function(x){
@@ -1405,7 +1644,14 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     if (net.t) joinGame(code, false);
   });
 
-  $('btn-sound').addEventListener('click', function(){ P.sound = !P.sound; if (P.sound) { audio(); sfx('soon'); } else if (keepAlive) keepAlive.pause(); savePrefs(); render(); });
+  $('panel-sound').addEventListener('click', function(e){ if (e.target.closest('#snd-take')) takeMusic(); });
+  $('snd-music').addEventListener('change', function(e){ P.music = e.target.checked; savePrefs(); musicPrime(); musicSync(); renderSound(); });
+  $('snd-vol').addEventListener('input', function(e){ P.vol = +e.target.value; savePrefs(); });
+  $('snd-effect').addEventListener('change', function(e){ P.effect = e.target.checked; savePrefs(); });
+  $('snd-chimes').addEventListener('change', function(e){
+    P.chimes = e.target.checked; savePrefs();
+    if (P.chimes) { audio(); sfx('soon'); }
+  });
   $('btn-full').addEventListener('click', function(){
     try {
       if (document.fullscreenElement) document.exitFullscreen();
@@ -1414,8 +1660,11 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   });
   if (!document.documentElement.requestFullscreen) $('btn-full').hidden = true;
   document.addEventListener('visibilitychange', function(){ if (!document.hidden && S.phase === 'running') { wake(); tick(); } });
-  // Browsers only allow sound after a tap, so a player's first tap anywhere unlocks the alarm.
-  document.addEventListener('pointerdown', function(){ audio(); }, {once:true});
+  // Browsers only allow sound after a tap, so taps unlock the alarm and, on the music device, the music.
+  document.addEventListener('pointerdown', function(){
+    audio();
+    if (isDJ() && P.music) { musicPrime(); if (M.blocked) { M.blocked = false; musicSync(); } }
+  });
 
   /* ================= boot ================= */
   function boot(data){
