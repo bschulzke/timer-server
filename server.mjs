@@ -268,7 +268,8 @@ setInterval(sweep, 3600e3).unref();
 
 /* ---------- static files ---------- */
 const TYPES = { '.html': 'text/html; charset=utf-8', '.jpg': 'image/jpeg', '.png': 'image/png', '.svg': 'image/svg+xml',
-                '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.txt': 'text/plain' };
+                '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.txt': 'text/plain',
+                '.mp3': 'audio/mpeg' };
 function page() {
   // The page looks for this tag to know it is running against its own server.
   return fs.readFileSync(path.join(PUBLIC, 'index.html'), 'utf8').replace('<meta name="shenan-ws" content="">', '<meta name="shenan-ws" content="/ws">');
@@ -283,10 +284,25 @@ const server = http.createServer((req, res) => {
   }
   const file = path.normalize(path.join(PUBLIC, decodeURIComponent(url.pathname)));
   if (!file.startsWith(PUBLIC + path.sep) || path.basename(file) === 'index.html') { res.writeHead(404); return res.end('Not found'); }
-  fs.readFile(file, (err, buf) => {
-    if (err) { res.writeHead(404); return res.end('Not found'); }
-    res.writeHead(200, { ...headers, 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'public, max-age=86400' });
-    res.end(buf);
+  fs.stat(file, (err, st) => {
+    if (err || !st.isFile()) { res.writeHead(404); return res.end('Not found'); }
+    const base = { ...headers, 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream',
+                   'Cache-Control': 'public, max-age=86400', 'Accept-Ranges': 'bytes' };
+    // Browsers fetch audio in pieces (byte ranges) to seek, and iPhones won't play audio without it.
+    const m = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || '');
+    if (m && (m[1] || m[2])) {
+      let start = m[1] ? +m[1] : Math.max(0, st.size - +m[2]);
+      let end = m[1] && m[2] ? Math.min(+m[2], st.size - 1) : st.size - 1;
+      if (start >= st.size || start > end) {
+        res.writeHead(416, { ...base, 'Content-Range': `bytes */${st.size}` }); return res.end();
+      }
+      res.writeHead(206, { ...base, 'Content-Range': `bytes ${start}-${end}/${st.size}`, 'Content-Length': end - start + 1 });
+      if (req.method === 'HEAD') return res.end();
+      return fs.createReadStream(file, { start, end }).pipe(res);
+    }
+    res.writeHead(200, { ...base, 'Content-Length': st.size });
+    if (req.method === 'HEAD') return res.end();
+    fs.createReadStream(file).pipe(res);
   });
 });
 server.on('upgrade', (req, socket, head) => {

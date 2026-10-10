@@ -8,6 +8,10 @@ except OSError: pass
 srv = subprocess.Popen(['node', 'server.mjs'], env=env, cwd=HERE); time.sleep(1)
 URL = 'http://localhost:3916/'
 bad = 0
+def tool(pg, sel):
+    # Phones keep the tool buttons in the three-dot menu.
+    if pg.is_visible('#btn-menu'): pg.click('#btn-menu'); pg.wait_for_timeout(150)
+    pg.click(sel)
 def check(c, name):
     global bad
     print(('pass ' if c else 'FAIL ') + name); bad += 0 if c else 1
@@ -22,17 +26,17 @@ try:
         gm.click('[data-land=host]'); gm.wait_for_timeout(2500)
         m = M(gm); print('  gm after host:', m)
         check(m['on'] and m['mode'] == 'lobby' and 'cool-vibes' in m['src'] and m['playing'], 'GM device starts Cool Vibes on hosting')
-        gm.click('#btn-share'); gm.wait_for_timeout(300)
+        gm.click('#chip'); gm.wait_for_timeout(300)
         code = re.search(r'#([A-Z0-9]{4})', gm.inner_text('#panel-share')).group(1)
         gm.select_option('#speed', '60'); gm.click('#panel-share .panel-x')
 
         pl.goto(URL + '?test#' + code); pl.wait_for_timeout(1500); pl.click('body', position={'x': 5, 'y': 300}); pl.wait_for_timeout(800)
         check(not M(pl)['on'], 'player device stays quiet')
-        pl.click('#btn-sound'); pl.wait_for_timeout(300)
+        tool(pl, '#btn-sound'); pl.wait_for_timeout(300)
         check(not pl.is_checked('#snd-chimes'), 'chimes default off on a non-music device')
         check('GM’s device' in pl.inner_text('#snd-dj'), 'player sees the music is on the GM device')
         pl.screenshot(path='/tmp/snd_player.png'); pl.click('#panel-sound .panel-x')
-        gm.click('#btn-sound'); gm.wait_for_timeout(300)
+        tool(gm, '#btn-sound'); gm.wait_for_timeout(300)
         check(gm.is_checked('#snd-chimes'), 'chimes default on for the music device')
         gm.screenshot(path='/tmp/snd_gm.png'); gm.click('#panel-sound .panel-x')
 
@@ -56,10 +60,22 @@ try:
         gm.wait_for_timeout(5500)
         m = M(gm); print('  gm after reset:', m)
         check(m['mode'] == 'lobby' and 'cool-vibes' in m['src'], 'Cool Vibes back between loops')
+        gm.evaluate("() => { const e = window.__music.el; e.currentTime = e.duration - 5; }")
+        gm.wait_for_timeout(6500)
+        t = gm.evaluate("() => window.__music.el.currentTime")
+        check('cool-vibes' in M(gm)['src'] and t < 5 and M(gm)['playing'], 'Cool Vibes dips and starts over at its end')
         gm.click('[data-act=start]'); gm.wait_for_timeout(2500)
         check('spy-glass' in M(gm)['src'], 'loop 2 opens on Spy Glass')
+        # Between songs: jump to 6 s before Spy Glass ends; it should dip out, then Fast Talkin fades in.
+        gm.evaluate("() => { const e = window.__music.el; e.currentTime = e.duration - 6; }")
+        gm.wait_for_timeout(3500)
+        m = M(gm); print('  mid-dip:', m)
+        check('spy-glass' in m['src'] and m['fade'] < 0.8, 'song fades out over its last seconds')
+        gm.wait_for_timeout(4000)
+        m = M(gm); print('  after dip:', m)
+        check('fast-talkin' in m['src'] and m['playing'], 'next song in the rotation fades in')
 
-        pl.click('#btn-sound'); pl.wait_for_timeout(200); pl.click('#snd-take'); pl.wait_for_timeout(2500)
+        tool(pl, '#btn-sound'); pl.wait_for_timeout(200); pl.click('#snd-take'); pl.wait_for_timeout(2500)
         mp, mg = M(pl), M(gm); print('  after handoff pl:', mp, 'gm:', mg)
         check(mp['on'] and mp['mode'] == 'loop' and 'spy-glass' in mp['src'], 'player takes over the music, on the current loop track')
         check(not mg['on'], 'GM device goes quiet')

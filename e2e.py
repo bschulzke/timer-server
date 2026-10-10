@@ -9,6 +9,10 @@ srv = subprocess.Popen(['node','server.mjs'], env=env, cwd=HERE)
 time.sleep(1)
 URL='http://localhost:3912/'
 bad = 0
+def tool(pg, sel):
+    # Phones keep the tool buttons in the three-dot menu.
+    if pg.is_visible('#btn-menu'): pg.click('#btn-menu'); pg.wait_for_timeout(150)
+    pg.click(sel)
 def check(c, name):
     global bad
     print(('pass ' if c else 'FAIL ') + name); bad += 0 if c else 1
@@ -19,8 +23,8 @@ try:
         gm = gctx.new_page(); pl = pctx.new_page()
         for n,pg in (('gm',gm),('pl',pl)): pg.on('pageerror', lambda e,n=n: print(n,'page error',e))
         gm.goto(URL); gm.wait_for_selector('[data-land=host]:not([disabled])')
-        gm.click('[data-land=host]'); gm.wait_for_selector('#btn-share', state='visible')
-        gm.click('#btn-share'); gm.wait_for_timeout(300)
+        gm.click('[data-land=host]'); gm.wait_for_selector('#chip:not([hidden])')
+        gm.click('#chip'); gm.wait_for_timeout(300)
         code = re.search(r'#([A-Z0-9]{4})', gm.inner_text('#panel-share'))
         check(bool(code), 'GM gets a join code'); code = code.group(1)
         link = gm.inner_text('#share-link'); check(link.startswith('http://localhost:3912/#'), 'join link points at our own server: ' + link)

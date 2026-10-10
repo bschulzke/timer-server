@@ -81,7 +81,12 @@ button,input,select{font:inherit;color:inherit}
 .wordmark{display:flex;align-items:baseline;gap:10px;margin:0;font-weight:400}
 .wordmark b{font:italic 900 30px/1 var(--display);letter-spacing:.01em;color:var(--paper)}
 .wordmark span{font:700 12px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--amber)}
+.bar-end{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px 12px}
 .tools{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
+.menu-btn{display:none;width:44px;height:40px;align-items:center;justify-content:center;border:1px solid var(--line-dim);background:var(--navy-deep);color:var(--paper);cursor:pointer;border-radius:0}
+.menu-btn svg{fill:currentColor}
+.menu-btn:hover,.menu-btn[aria-expanded=true]{border-color:var(--amber);color:var(--amber)}
+.menu-btn.attn{border-color:var(--amber);color:var(--amber)}
 .dock{display:grid;gap:10px;min-width:0}
 .panels{display:contents}
 /* settings open as a centered dialog over a dimmed page */
@@ -151,8 +156,18 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   .actions .btn{font-size:clamp(10px,3.1vw,12px);padding:12px clamp(6px,2.4vw,12px);letter-spacing:.04em;white-space:nowrap}
   .actions .btn.primary{font-size:clamp(11px,3.4vw,13px);padding:14px clamp(8px,3vw,14px);box-shadow:3px 3px 0 var(--navy-deep)}
   .actions .btn.quiet{padding-inline:4px}
-  .tools{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px}
-  .tools .btn.small{padding:11px 2px;font-size:clamp(9px,2.7vw,11px);letter-spacing:.04em;white-space:nowrap;text-align:center;overflow:hidden}
+  /* phones: wordmark and menu button share the top row, the game chip sits under them,
+     and the tool buttons drop down from the menu button */
+  .bar{display:grid;grid-template-columns:minmax(0,1fr) auto;position:relative}
+  .bar-end{display:contents}
+  .wordmark{grid-column:1;grid-row:1}
+  .menu-btn{display:inline-flex;grid-column:2;grid-row:1}
+  .bar .chip{grid-column:1/-1;grid-row:2;justify-self:start}
+  .tools{display:none;position:absolute;z-index:30;right:0;top:46px;min-width:min(240px,calc(100vw - 32px));
+    flex-direction:column;flex-wrap:nowrap;gap:0;background:var(--navy-deep);border:1.5px solid var(--line);box-shadow:0 10px 30px var(--shadow)}
+  .tools.open{display:flex}
+  .tools .btn.small{border:0;border-bottom:1px solid var(--line-dim);padding:15px 16px;font-size:13px;text-align:left;background:transparent}
+  .tools .btn.small:last-child{border-bottom:0}
 }
 
 /* shared game */
@@ -300,7 +315,18 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
 <div class="app">
   <div class="bar">
     <h1 class="wordmark"><b>Shenan-Again</b><span>Loop timer</span></h1>
-    <button class="chip" id="chip" hidden></button>
+    <div class="bar-end" id="bar-end">
+      <button class="chip" id="chip" hidden></button>
+      <button class="menu-btn" id="btn-menu" aria-expanded="false" aria-controls="tools" aria-label="Menu">
+        <svg viewBox="0 0 4 18" width="4" height="18" aria-hidden="true"><circle cx="2" cy="2" r="2"/><circle cx="2" cy="9" r="2"/><circle cx="2" cy="16" r="2"/></svg>
+      </button>
+      <div class="tools" id="tools">
+        <button class="btn small" id="btn-share" aria-expanded="false" aria-controls="panel-share">Share game</button>
+        <button class="btn small" id="btn-bg" aria-expanded="false" aria-controls="panel-bg">Backdrop</button>
+        <button class="btn small" id="btn-sound" aria-expanded="false" aria-controls="panel-sound">Sound</button>
+        <button class="btn small" id="btn-full">Full screen</button>
+      </div>
+    </div>
   </div>
 
   <section class="landing" id="landing" hidden>
@@ -389,12 +415,6 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
         <div class="panel-head"><h2>Game</h2><button class="panel-x" data-close aria-label="Close game panel">×</button></div>
         <div class="share" id="share-body"></div>
       </section>
-    </div>
-    <div class="tools">
-      <button class="btn small" id="btn-share" aria-expanded="false" aria-controls="panel-share">Share game</button>
-      <button class="btn small" id="btn-bg" aria-expanded="false" aria-controls="panel-bg">Backdrop</button>
-      <button class="btn small" id="btn-sound" aria-expanded="false" aria-controls="panel-sound">Sound</button>
-      <button class="btn small" id="btn-full">Full screen</button>
     </div>
   </div>
 </div>
@@ -972,11 +992,8 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
         M.fade = a.createGain(); M.vol = a.createGain();
         M.fade.gain.value = 0; M.vol.gain.value = volLevel();
         node.connect(M.fade); M.fade.connect(M.vol); M.vol.connect(a.destination);
-        M.el.addEventListener('ended', function(){
-          if (M.mode !== 'loop') return;
-          M.rot = (M.rot + 1) % TRACKS.loop.length;
-          playTrack(TRACKS.loop[M.rot], false, 1.2);
-        });
+        // Normally nextSong() runs a few seconds early (see songEnding); this catches a track that ran out first.
+        M.el.addEventListener('ended', function(){ if (!M.leaving && (M.mode === 'loop' || M.mode === 'lobby')) nextSong(); });
       } catch(e){ M.el = null; return false; }
     }
     return true;
@@ -1004,11 +1021,30 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     var seq = M.seq;
     M.timers.push(setTimeout(function(){ if (seq === M.seq) fn(); }, sec * 1000));
   }
-  function cancelLater(){ M.seq++; M.timers.forEach(clearTimeout); M.timers = []; }
-  function playTrack(src, loop, fadeIn){
-    M.el.loop = loop;
+  function cancelLater(){ M.seq++; M.timers.forEach(clearTimeout); M.timers = []; M.leaving = false; }
+  // Between songs: the old one fades out over its last few seconds, a short beat of silence, then the next fades in.
+  var DIP_OUT = 4, DIP_GAP = 0.5, DIP_IN = 2;
+  function songEnding(){
+    if (M.leaving || !(M.mode === 'loop' || M.mode === 'lobby')) return;
+    var d = M.el.duration; if (!isFinite(d) || d <= 0 || M.el.paused) return;
+    var left = (d - M.el.currentTime) / (M.el.playbackRate || 1);
+    if (left > DIP_OUT) return;
+    M.leaving = true;
+    fadeTo(0, Math.max(0.3, left - 0.2));
+    later(left + DIP_GAP, nextSong);
+  }
+  function nextSong(){
+    M.leaving = false;
+    if (M.mode === 'lobby') { playTrack(TRACKS.lobby, DIP_IN, true); return; }
+    if (M.mode !== 'loop') return;
+    M.rot = (M.rot + 1) % TRACKS.loop.length;
+    playTrack(TRACKS.loop[M.rot], DIP_IN, true);
+  }
+  function playTrack(src, fadeIn, fromStart){
+    M.el.loop = false;
     if (M.src !== src || M.el.ended) { M.el.src = src; M.src = src; }
-    setRate(1, true);
+    else if (fromStart) M.el.currentTime = 0;
+    setRate(M.rateTo, true);   // a new song starts at whatever speed the clock calls for
     var pr = M.el.play();
     if (pr && pr.catch) pr.catch(function(){ M.blocked = true; renderSound(); });
     fadeTo(1, fadeIn);
@@ -1023,10 +1059,10 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
       if (i >= 15) clearInterval(M.rateTimer);
     }, 100);
   }
-  function startLobby(fadeIn){ M.mode = 'lobby'; playTrack(TRACKS.lobby, true, fadeIn); }
+  function startLobby(fadeIn){ M.mode = 'lobby'; playTrack(TRACKS.lobby, fadeIn); }
   function startLoop(fadeIn){
     M.mode = 'loop'; M.rot = (S.loop - 1) % TRACKS.loop.length;
-    playTrack(TRACKS.loop[M.rot], false, fadeIn);
+    playTrack(TRACKS.loop[M.rot], fadeIn, true);
   }
   function startFor(fadeIn){
     if (S.phase === 'running' || S.phase === 'paused') startLoop(fadeIn); else startLobby(fadeIn);
@@ -1087,6 +1123,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     }
     setVolIfChanged();
     finalMinutes();
+    songEnding();
   }
   var lastVolKey = '';
   function setVolIfChanged(){
@@ -1142,7 +1179,8 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     $('snd-vol').value = P.vol; $('snd-vol').disabled = !mine;
     $('snd-effect').checked = !!P.effect; $('snd-effect').disabled = !mine;
     $('snd-chimes').checked = chimesOn();
-    $('btn-sound').classList.toggle('attn', mine && !!P.music && inGame() && M.blocked && !M.on);
+    var waiting = mine && !!P.music && inGame() && M.blocked && !M.on;
+    $('btn-sound').classList.toggle('attn', waiting); $('btn-menu').classList.toggle('attn', waiting);
   }
 
   /* ================= clock (GM only) ================= */
@@ -1324,6 +1362,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   function draw(){
     var inG = inGame();
     $('landing').hidden = inG; $('sheet').hidden = !inG; $('titleblock').hidden = !inG; $('dock').hidden = !inG;
+    $('tools').hidden = !inG; $('btn-menu').hidden = !inG; if (!inG) closeMenu();
     if (!inG) { renderLanding(); renderBg(); renderChip(); return; }
     var gm = canControl(), w = canWrite();
     $('dial').dataset.phase = S.phase;
@@ -1393,7 +1432,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   function renderChip(){
     var chip = $('chip');
     chip.hidden = !net.code;
-    $('btn-share').textContent = net.code ? 'Game ' + net.code : 'Game';
+    $('btn-share').textContent = 'Game'; $('btn-share').hidden = !!net.code;   // in a shared game the chip opens it
     if (!net.code) return;
     var role = net.status === 'connecting' ? 'connecting' : net.status === 'error' ? 'offline'
       : net.readOnly ? 'watching' : canControl() ? 'GM' : 'player';
@@ -1596,9 +1635,22 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   // Capture phase: decide before a panel re-renders and detaches the clicked element.
   document.addEventListener('click', function(e){
     if (e.target.closest('[data-close]')) { closePanels(true); return; }
-    if (!e.target.closest('.panel') && !e.target.closest('.tools') && !e.target.closest('#chip') && !e.target.closest('label[for="bg-file"]')) closePanels(false);
+    if (!e.target.closest('.panel') && !e.target.closest('.tools') && !e.target.closest('#btn-menu') && !e.target.closest('#chip') && !e.target.closest('label[for="bg-file"]')) closePanels(false);
   }, true);
-  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closePanels(true); });
+  document.addEventListener('keydown', function(e){
+    if (e.key !== 'Escape') return;
+    if ($('tools').classList.contains('open')) { closeMenu(); $('btn-menu').focus(); return; }
+    closePanels(true);
+  });
+  // Phones: the tool buttons live in a menu under the three-dot button.
+  function closeMenu(){ $('tools').classList.remove('open'); $('btn-menu').setAttribute('aria-expanded', 'false'); }
+  $('btn-menu').addEventListener('click', function(){
+    var open = !$('tools').classList.contains('open');
+    $('tools').classList.toggle('open', open); $('btn-menu').setAttribute('aria-expanded', String(open));
+    if (open) { var first = $('tools').querySelector('.btn:not([hidden])'); if (first) first.focus(); }
+  });
+  $('tools').addEventListener('click', function(e){ if (e.target.closest('.btn')) closeMenu(); });
+  document.addEventListener('click', function(e){ if (!e.target.closest('#tools') && !e.target.closest('#btn-menu')) closeMenu(); });
   // iPhones can still drag the page through the dimmed layer, so stop that drag outright.
   $('scrim').addEventListener('touchmove', function(e){ e.preventDefault(); }, {passive:false});
   PANELS.forEach(function(x){ $(x[0]).addEventListener('click', function(){ togglePanel(x[1]); }); });
