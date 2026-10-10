@@ -18,6 +18,7 @@ services:
       DOMAIN: ${DOMAIN:?set DOMAIN in .env}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - /srv/previews/allowed:/previews/allowed:ro   # active PR previews (see deploy/preview.sh)
       - caddy-data:/data
       - caddy-config:/config
     depends_on:

@@ -49,6 +49,35 @@ Logs: `docker compose logs -f timer`. Stop: `docker compose down` (add `-v` to a
 The Caddyfile also redirects tinytabletops.com and www to the timer, as a temporary (302) redirect.
 Delete that block once the domain gets its own site.
 
+## PR previews
+Every pull request from a branch in this repo gets its own copy of the app at
+`https://<PR number>.preview.tinytabletops.com`, posted as a comment on the PR, updated on every push and
+removed when the PR closes. Previews keep no saved data and never touch the live site. At most three run at once.
+
+How it fits together:
+- `.github/workflows/preview.yml` connects to the droplet over SSH and runs `deploy <pr> <sha>` or `remove <pr>`.
+- That SSH key can only run `deploy/preview.sh` (a forced command), which checks its input, builds the PR's
+  commit into a container named `timer-pr-<n>` on the live compose network, and lists it in `/srv/previews/allowed`.
+- Caddy routes `<n>.preview.tinytabletops.com` to `timer-pr-<n>` and gets a certificate for a name the first
+  time it's visited, but only if that name is in `/srv/previews/allowed`.
+
+One-time setup (droplet, as root):
+
+    # DNS first: an A record with host *.preview pointing at the droplet
+    adduser --disabled-password --gecos "" deploy && usermod -aG docker deploy
+    mkdir -p /srv/previews/src /srv/previews/allowed && chown -R deploy:deploy /srv/previews
+    install -o root -m 755 ~/timer-server/deploy/preview.sh /usr/local/bin/timer-preview
+    ssh-keygen -t ed25519 -N "" -C github-preview -f /root/preview-key
+    install -d -o deploy -m 700 /home/deploy/.ssh
+    echo "command=\"/usr/local/bin/timer-preview\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty $(cat /root/preview-key.pub)" > /home/deploy/.ssh/authorized_keys
+    chown deploy /home/deploy/.ssh/authorized_keys && chmod 600 /home/deploy/.ssh/authorized_keys
+    cd ~/timer-server && git pull && docker compose up -d --build
+
+Then add repository secrets on GitHub: `PREVIEW_HOST` (the droplet's IP), `PREVIEW_SSH_KEY` (the contents of
+`/root/preview-key`), and optionally `PREVIEW_KNOWN_HOSTS` (the output of `ssh-keyscan -t ed25519 <ip>`).
+Delete `/root/preview-key` from the droplet once the secret is saved. `timer-preview list` shows running previews.
+The script is installed as a root-owned copy so the deploy user can't change it; if `deploy/preview.sh` changes, re-run the `install` line.
+
 ## Settings (environment variables on the `timer` service)
 `MAX_AGE_HOURS` (default 72), `MAX_GAMES` (default 2000), `PORT`, `DATA_FILE`.
 
