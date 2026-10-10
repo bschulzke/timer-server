@@ -60,6 +60,12 @@ await wait(500);
 ok((await p1.req({ op: 'write', code: 'ABCD', game: game({ hostId: 'pl1', rev: 4 }) })).ok, 'takeover allowed once GM has been gone a while');
 ok((await p1.req({ op: 'hello', device: 'bad id!' })).code === 'invalid_argument', 'bad device id refused');
 
+const r1 = await fetch(`http://localhost:${PORT}/music/fast-talkin.mp3`, { headers: { Range: 'bytes=100-199' } });
+ok(r1.status === 206 && r1.headers.get('content-range').startsWith('bytes 100-199/') && (await r1.arrayBuffer()).byteLength === 100, 'audio served in byte ranges');
+const r2 = await fetch(`http://localhost:${PORT}/music/fast-talkin.mp3`, { method: 'HEAD' });
+ok(r2.status === 200 && r2.headers.get('content-type') === 'audio/mpeg' && r2.headers.get('accept-ranges') === 'bytes', 'audio served as audio/mpeg');
+ok((await fetch(`http://localhost:${PORT}/../server.mjs`)).status === 404, 'no files outside public/');
+
 p1.ws.close(); srv.kill('SIGTERM');
 await wait(2500);
 const saved = JSON.parse(fs.readFileSync(DATA, 'utf8'));
