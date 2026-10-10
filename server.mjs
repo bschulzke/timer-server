@@ -67,6 +67,7 @@ function cleanGame(g) {
     hostId: typeof g.hostId === 'string' && ID_RE.test(g.hostId) ? g.hostId : null,
     origHost: typeof g.origHost === 'string' && ID_RE.test(g.origHost) ? g.origHost : null,
     rev: int(g.rev, 0, 1e9, 0),
+    dj: typeof g.dj === 'string' && ID_RE.test(g.dj) ? g.dj : null,
   };
   return o;
 }
@@ -147,6 +148,7 @@ function mayWriteGame(code, device, next) {
     watch  {code}                     -> {ok}; then pushes {ev:'game'} and {ev:'marks'} now and on every change
     unwatch{code}
     join   {code}                     -> {ok}; adds this device to the game's presence list, pushed as {ev:'peers'}
+    dj     {code}                     -> {ok}; makes this device the one that plays the music
 */
 function handle(ws, m) {
   const { op, rid } = m;
@@ -194,10 +196,19 @@ function handle(ws, m) {
         return;
       }
       const cur = games.get(code);
+      // The music device is set only through 'dj'; a clock write never moves it.
+      next.dj = cur ? (cur.game.dj || cur.game.hostId) : next.hostId;
       if (cur) { cur.game = { ...next, updatedAt: Date.now() }; cur.touched = Date.now(); }
       else games.set(code, { game: { ...next, updatedAt: Date.now() }, marks: new Map(), touched: Date.now() });
       if (ws.device === next.hostId) hostSeen.set(code, Date.now());     // the GM just proved they are here
       trackHost(code); saveSoon();
+      reply(ws, rid, { ok: true });
+      return broadcastGame(code, null);
+    }
+    case 'dj': {                                                       // "Play music here": any device in the game
+      const g = games.get(code);
+      if (!g) return bad('not_found');
+      g.game = { ...g.game, dj: ws.device, updatedAt: Date.now() }; g.touched = Date.now(); saveSoon();
       reply(ws, rid, { ok: true });
       return broadcastGame(code, null);
     }

@@ -48,10 +48,16 @@ ok(last && last.marks.length === 1 && last.marks[0].note === 'Guard changes shif
 ok((await p1.req({ op: 'wmark', code: 'ABCD', id: 'bad id!', mark: { t: 1 } })).code === 'invalid_argument', 'bad mark id refused');
 ok((await p1.req({ op: 'dmark', code: 'ABCD', id: 'm1' })).ok, 'player deletes it');
 
+ok((await p1.req({ op: 'read', code: 'ABCD' })).data.dj === 'gm1', 'music plays on the GM device by default');
+ok((await p1.req({ op: 'dj', code: 'ABCD' })).ok, 'a player can take over the music');
+ok((await p1.req({ op: 'read', code: 'ABCD' })).data.dj === 'pl1', 'music device moved to the player');
+await gm.req({ op: 'write', code: 'ABCD', game: game({ phase: 'paused', rev: 3, dj: 'gm1' }) });
+ok((await p1.req({ op: 'read', code: 'ABCD' })).data.dj === 'pl1', 'a GM clock write does not move the music back');
+
 gm.ws.close(); await wait(100);
-ok((await p1.req({ op: 'write', code: 'ABCD', game: game({ hostId: 'pl1', rev: 3 }) })).code === 'rejected', 'takeover still refused right after GM leaves');
+ok((await p1.req({ op: 'write', code: 'ABCD', game: game({ hostId: 'pl1', rev: 4 }) })).code === 'rejected', 'takeover still refused right after GM leaves');
 await wait(500);
-ok((await p1.req({ op: 'write', code: 'ABCD', game: game({ hostId: 'pl1', rev: 3 }) })).ok, 'takeover allowed once GM has been gone a while');
+ok((await p1.req({ op: 'write', code: 'ABCD', game: game({ hostId: 'pl1', rev: 4 }) })).ok, 'takeover allowed once GM has been gone a while');
 ok((await p1.req({ op: 'hello', device: 'bad id!' })).code === 'invalid_argument', 'bad device id refused');
 
 p1.ws.close(); srv.kill('SIGTERM');

@@ -10,11 +10,23 @@ doesn't lose them. Devices connect over one WebSocket (`/ws`). Idle games are de
 - Each connection is rate limited. Messages over 8 KB are refused.
 - Devices sync to the server's clock, so a phone with a wrong clock still counts down correctly.
 
+## Music
+Music plays on one device only: the GM's by default, or whichever device last tapped "Play music here"
+(in the Sound dialog). Cool Vibes plays whenever the clock isn't running. Each loop opens on the next track
+of the rotation (Covert Affair, Spy Glass, Fast Talkin, Bossa Antigua). In the last three minutes the music
+speeds up and a clock ticks; both pick up again in the last minute. At the end of a loop the music drops
+under the alarm, then Cool Vibes fades back in. Getting out or getting caught plays a short sting first.
+The alarm and chimes are on by default only on the music device; anyone can turn them on for their own.
+
+Tracks live in `public/music/` (re-encoded to 128 kbps). They're by Kevin MacLeod (incompetech.com),
+licensed under Creative Commons: By Attribution 4.0. The credit is shown in the Sound dialog.
+
 ## Run it on your computer
     npm install
     npm start            # http://localhost:3000
     npm test             # protocol checks
     python3 e2e.py       # two real browsers (needs playwright)
+    python3 e2e_music.py # music: hand-off, rotation, final-minutes effect (about 2 minutes)
 
 ## Deploy to the droplet
 First time:
