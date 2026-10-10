@@ -176,7 +176,10 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
 }
 
 /* shared game */
-.chip{font:700 11px/1.3 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--amber)}   /* status text, not a control */
+.chip{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;background:rgba(6,34,63,.92);font:700 11px/1.3 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--amber)}   /* status text, not a control: solid ground, no border */
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.chip[data-status=error],.chip[data-status=connecting]{color:var(--line)}
+.chip[data-status=error]::before{background:var(--alarm)}
 .share{display:grid;gap:14px}
 .share input{min-width:0;background:var(--navy);border:1px solid var(--line-dim);padding:8px 10px;font:400 14px/1.2 var(--mono);color:var(--paper);border-radius:0}
 .share #join-code{width:6.5em;text-transform:uppercase;letter-spacing:.2em}
@@ -1470,6 +1473,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     if (!net.code) return;
     var role = net.status === 'connecting' ? 'connecting' : net.status === 'error' ? 'offline'
       : net.readOnly ? 'watching' : canControl() ? 'GM' : 'player';
+    chip.dataset.status = net.status;
     chip.textContent = 'Game ' + net.code + ' · ' + role + (net.peers ? ' · ' + peerCount() + ' here' : '') + (net.warn ? ' · not saved' : '');
   }
   // Phones: game actions sit at the top of the three-dot menu.
