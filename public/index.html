@@ -87,6 +87,7 @@ button,input,select{font:inherit;color:inherit}
 .menu-btn svg{fill:currentColor}
 .menu-btn:hover,.menu-btn[aria-expanded=true]{border-color:var(--amber);color:var(--amber)}
 .menu-btn.attn{border-color:var(--amber);color:var(--amber)}
+.tools .narrow,.tools .menu-only{display:none}
 .dock{display:grid;gap:10px;min-width:0}
 .panels{display:contents}
 /* settings open as a centered dialog over a dimmed page */
@@ -168,11 +169,14 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   .tools.open{display:flex}
   .tools .btn.small{border:0;border-bottom:1px solid var(--line-dim);padding:15px 16px;font-size:13px;text-align:left;background:transparent}
   .tools .btn.small:last-child{border-bottom:0}
+  .tools .wide{display:none}
+  .tools .narrow{display:inline}
+  .tools .btn.menu-only{display:block}
+  .tools .menu-rule{display:block;height:0;border-top:1.5px solid var(--line)}
 }
 
 /* shared game */
-.chip{font:700 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;padding:9px 12px;border:1px solid var(--amber);background:var(--navy-deep);color:var(--amber);cursor:pointer;border-radius:0}
-.chip:hover{background:var(--navy)}
+.chip{font:700 11px/1.3 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--amber)}   /* status text, not a control */
 .share{display:grid;gap:14px}
 .share input{min-width:0;background:var(--navy);border:1px solid var(--line-dim);padding:8px 10px;font:400 14px/1.2 var(--mono);color:var(--paper);border-radius:0}
 .share #join-code{width:6.5em;text-transform:uppercase;letter-spacing:.2em}
@@ -316,12 +320,15 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   <div class="bar">
     <h1 class="wordmark"><b>Shenan-Again</b><span>Loop timer</span></h1>
     <div class="bar-end" id="bar-end">
-      <button class="chip" id="chip" hidden></button>
+      <span class="chip" id="chip" role="status" hidden></span>
       <button class="menu-btn" id="btn-menu" aria-expanded="false" aria-controls="tools" aria-label="Menu">
         <svg viewBox="0 0 4 18" width="4" height="18" aria-hidden="true"><circle cx="2" cy="2" r="2"/><circle cx="2" cy="9" r="2"/><circle cx="2" cy="16" r="2"/></svg>
       </button>
       <div class="tools" id="tools">
-        <button class="btn small" id="btn-share" aria-expanded="false" aria-controls="panel-share">Share game</button>
+        <button class="btn small" id="btn-share" aria-expanded="false" aria-controls="panel-share"><span class="wide">Game</span><span class="narrow">Share game</span></button>
+        <button class="btn small menu-only" id="menu-new" type="button">New game</button>
+        <button class="btn small menu-only" id="menu-leave" type="button">Leave game</button>
+        <span class="menu-only menu-rule" aria-hidden="true"></span>
         <button class="btn small" id="btn-bg" aria-expanded="false" aria-controls="panel-bg">Backdrop</button>
         <button class="btn small" id="btn-sound" aria-expanded="false" aria-controls="panel-sound">Sound</button>
         <button class="btn small" id="btn-full">Full screen</button>
@@ -911,8 +918,12 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   // iPhones mute web-page sound when the ring/silent switch is off. Marking this page as media playback,
   // and keeping a silent clip looping, makes the alarm play through the switch like a video would.
   var SILENT = 'data:audio/wav;base64,UklGRsQPAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YaAPAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA', keepAlive = null;
+  // Only devices that play something keep the silent loop running (it's also what puts the page on the lock screen).
+  function needsKeepAlive(){ return chimesOn() || (inGame() && isDJ() && !!P.music); }
+  function syncKeepAlive(){ if (keepAlive && !keepAlive.paused && !needsKeepAlive()) keepAlive.pause(); }
   function unlockAudio(){
     try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch(e){}
+    if (!needsKeepAlive()) { syncKeepAlive(); return; }
     try {
       if (!keepAlive) { keepAlive = new Audio(SILENT); keepAlive.loop = true; keepAlive.setAttribute('playsinline', ''); }
       if (keepAlive.paused) { var pr = keepAlive.play(); if (pr && pr.catch) pr.catch(function(){}); }
@@ -993,6 +1004,9 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
         M.fade.gain.value = 0; M.vol.gain.value = volLevel();
         node.connect(M.fade); M.fade.connect(M.vol); M.vol.connect(a.destination);
         // Normally nextSong() runs a few seconds early (see songEnding); this catches a track that ran out first.
+        // Belt and braces: anything that starts the track on a device that shouldn't play music gets stopped.
+        M.el.addEventListener('play', function(){ if (!M.priming && !musicWanted()) clearTrack(); });
+        mediaSession();
         M.el.addEventListener('ended', function(){ if (!M.leaving && (M.mode === 'loop' || M.mode === 'lobby')) nextSong(); });
       } catch(e){ M.el = null; return false; }
     }
@@ -1003,9 +1017,24 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     if (!musicSetup() || M.primed) return;
     M.primed = true;
     if (M.on) return;
-    M.el.src = TRACKS.lobby; M.src = TRACKS.lobby;
+    M.el.src = TRACKS.lobby; M.src = TRACKS.lobby; M.priming = true;
     var pr = M.el.play();
-    if (pr && pr.then) pr.then(function(){ if (!M.on) M.el.pause(); }, function(){ M.primed = false; });
+    if (pr && pr.then) pr.then(function(){ M.priming = false; if (!M.on) clearTrack(); }, function(){ M.priming = false; M.primed = false; });
+  }
+  // A device not playing music holds no track, so the lock screen's play button has nothing to start.
+  function clearTrack(){
+    if (!M.el) return;
+    M.el.pause(); M.el.removeAttribute('src'); M.src = '';
+    try { M.el.load(); } catch(e){}
+  }
+  function mediaSession(){
+    var ms = navigator.mediaSession; if (!ms) return;
+    try {
+      ms.metadata = new MediaMetadata({title: 'Shenan-Again Loop Timer', artist: 'Tiny Tabletop Games'});
+      ms.setActionHandler('play', function(){ if (musicWanted() && M.on && M.el) M.el.play().catch(function(){}); });
+      ms.setActionHandler('pause', function(){ if (M.el) M.el.pause(); });
+      ['previoustrack', 'nexttrack', 'seekbackward', 'seekforward', 'seekto'].forEach(function(a){ try { ms.setActionHandler(a, null); } catch(e){} });
+    } catch(e){}
   }
   function volLevel(){ var v = Math.max(0, Math.min(100, +P.vol || 0)) / 100; return v * v; }
   function setVol(paused, dur){
@@ -1078,7 +1107,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     cancelLater(); M.on = false; M.mode = ''; M.phase = null;
     if (!M.el) return;
     fadeTo(0, dur);
-    later(dur + 0.05, function(){ M.el.pause(); });
+    later(dur + 0.05, clearTrack);
     setRate(1, true);
   }
   // The clock changed state: move the music along with it.
@@ -1113,6 +1142,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   }
   // Runs ten times a second, from tick().
   function musicSync(){
+    syncKeepAlive();
     if (!musicWanted()) { if (M.on) { musicStop(1.2); renderSound(); } return; }
     if (!M.el || !M.primed || !ac || ac.state !== 'running') { if (!M.blocked) { M.blocked = true; renderSound(); } return; }
     if (!M.on) { musicStart(); renderSound(); return; }
@@ -1265,10 +1295,14 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   function captionFor(s){
     if (confirming === 'skip' && canControl()) return {fixed:true, k:'Skip to reset', v:'Skip the rest of loop ' + S.loop + ' and reset?',
       acts:'<button class="cap-btn" data-act="skip-yes">Reset the loop</button><button class="cap-btn ghost" data-act="cancel">Keep going</button>'};
+    if (confirming === 'leave') return {fixed:true, k: net.code ? 'Leave game ' + net.code : 'Back to start',
+      v: net.code ? 'The game carries on without this device. You can rejoin with the code.' : 'Your solo game stays saved on this device.',
+      acts:'<button class="cap-btn" data-act="leave-yes">' + (net.code ? 'Leave' : 'Back to start') + '</button><button class="cap-btn ghost" data-act="cancel">Stay</button>'};
     if (confirming === 'new' && canControl()) return {fixed:true, k:'New game', v:'Start over? This clears the loop count and every timestamp' + (net.code ? ' for everyone' : '') + '.',
       acts:'<button class="cap-btn" data-act="new-yes">New game</button><button class="cap-btn ghost" data-act="cancel">Cancel</button>'};
     if (net.code && net.status === 'connecting') return {fixed:true, k:'Game ' + net.code, v:'Connecting…'};
-    if (net.code && net.status === 'error') return {fixed:true, k:'Game ' + net.code, v:'The connection dropped. Tap the game code to reconnect.'};
+    if (net.code && net.status === 'error') return {fixed:true, k:'Game ' + net.code, v:'The connection dropped.',
+      acts:'<button class="cap-btn" data-act="retry">Reconnect</button>'};
     if (S.phase === 'caught') return {k:'Caught', v:'The third timer went off before you got out.'};
     if (S.phase === 'won') return {k:'Heist pulled off', v:'You got out with ' + fmt(S.won) + ' on the clock.'};
     if (!canControl()) {
@@ -1432,11 +1466,16 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   function renderChip(){
     var chip = $('chip');
     chip.hidden = !net.code;
-    $('btn-share').textContent = 'Game'; $('btn-share').hidden = !!net.code;   // in a shared game the chip opens it
+    renderMenu();
     if (!net.code) return;
     var role = net.status === 'connecting' ? 'connecting' : net.status === 'error' ? 'offline'
       : net.readOnly ? 'watching' : canControl() ? 'GM' : 'player';
     chip.textContent = 'Game ' + net.code + ' · ' + role + (net.peers ? ' · ' + peerCount() + ' here' : '') + (net.warn ? ' · not saved' : '');
+  }
+  // Phones: game actions sit at the top of the three-dot menu.
+  function renderMenu(){
+    $('menu-new').hidden = !canControl();
+    $('menu-leave').textContent = net.code ? 'Leave game' : 'Back to start';
   }
   // New game (for whoever runs the clock), leaving, and, with ?test, the clock speed.
   function gameActions(control, leaveLabel){
@@ -1568,6 +1607,8 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     else if (act === 'out') gotOut();
     else if (act === 'undo') { S.won = null; startClock(); }
     else if (act === 'new-yes') newGame();
+    else if (act === 'leave-yes') { confirming = null; leaveGame(''); }
+    else if (act === 'retry') { if (net.code) joinGame(net.code, false); }
     else if (act === 'cancel') { confirming = null; render(); }
     else if (act === 'take') takeClock();
   }
@@ -1635,7 +1676,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   // Capture phase: decide before a panel re-renders and detaches the clicked element.
   document.addEventListener('click', function(e){
     if (e.target.closest('[data-close]')) { closePanels(true); return; }
-    if (!e.target.closest('.panel') && !e.target.closest('.tools') && !e.target.closest('#btn-menu') && !e.target.closest('#chip') && !e.target.closest('label[for="bg-file"]')) closePanels(false);
+    if (!e.target.closest('.panel') && !e.target.closest('.tools') && !e.target.closest('#btn-menu') && !e.target.closest('label[for="bg-file"]')) closePanels(false);
   }, true);
   document.addEventListener('keydown', function(e){
     if (e.key !== 'Escape') return;
@@ -1650,11 +1691,12 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     if (open) { var first = $('tools').querySelector('.btn:not([hidden])'); if (first) first.focus(); }
   });
   $('tools').addEventListener('click', function(e){ if (e.target.closest('.btn')) closeMenu(); });
+  $('menu-new').addEventListener('click', function(){ if (!canControl()) return; confirming = 'new'; render(); });
+  $('menu-leave').addEventListener('click', function(){ confirming = 'leave'; render(); });
   document.addEventListener('click', function(e){ if (!e.target.closest('#tools') && !e.target.closest('#btn-menu')) closeMenu(); });
   // iPhones can still drag the page through the dimmed layer, so stop that drag outright.
   $('scrim').addEventListener('touchmove', function(e){ e.preventDefault(); }, {passive:false});
   PANELS.forEach(function(x){ $(x[0]).addEventListener('click', function(){ togglePanel(x[1]); }); });
-  $('chip').addEventListener('click', function(){ if ($('panel-share').hidden) togglePanel('panel-share'); });
 
   $('share-body').addEventListener('change', function(e){
     if (!e.target.matches('[data-share-speed]')) return;

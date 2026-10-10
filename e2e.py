@@ -24,7 +24,7 @@ try:
         for n,pg in (('gm',gm),('pl',pl)): pg.on('pageerror', lambda e,n=n: print(n,'page error',e))
         gm.goto(URL); gm.wait_for_selector('[data-land=host]:not([disabled])')
         gm.click('[data-land=host]'); gm.wait_for_selector('#chip:not([hidden])')
-        gm.click('#chip'); gm.wait_for_timeout(300)
+        tool(gm, '#btn-share'); gm.wait_for_timeout(300)
         code = re.search(r'#([A-Z0-9]{4})', gm.inner_text('#panel-share'))
         check(bool(code), 'GM gets a join code'); code = code.group(1)
         link = gm.inner_text('#share-link'); check(link.startswith('http://localhost:3912/#'), 'join link points at our own server: ' + link)
