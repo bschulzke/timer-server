@@ -1,0 +1,11 @@
+# Caddy gets and renews the HTTPS certificates by itself. DOMAIN comes from the .env file.
+{$DOMAIN} {
+	encode gzip
+	reverse_proxy timer:3000
+}
+
+# For now the bare domain sends visitors to the timer. 302 (temporary) so browsers don't remember it
+# once tinytabletops.com gets its own site. Delete this block then.
+tinytabletops.com, www.tinytabletops.com {
+	redir https://{$DOMAIN}{uri} 302
+}

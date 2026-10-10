@@ -1,0 +1,1453 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0A3057">
+<title>Shenan-Again Loop Timer</title>
+<meta name="shenan-ws" content="">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Ccircle%20cx=%2232%22%20cy=%2232%22%20r=%2231%22%20fill=%22%230A3057%22/%3E%3Ccircle%20cx=%2232%22%20cy=%2232%22%20r=%2226%22%20fill=%22none%22%20stroke=%22%23DEB148%22%20stroke-width=%226%22/%3E%3Cpath%20d=%22M32%2012v20l12%208%22%20fill=%22none%22%20stroke=%22%23A6C7F2%22%20stroke-width=%226%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="64x64" href="data:image/png;base64,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">
+<!--
+  Shenan-Again Loop Timer, proof of concept. Published as an artifact: https://claude.ai/artifact/Ezgp29R9uCECGqWPBxJXAZ
+  Backdrop files are published beside this page as bg/<name>.jpg plus bg/<name>_t.jpg thumbnails. They are not stored
+  in the project. Rebuild them from these project files:
+    vault  <- cover_art.jpg                    circus <- map_circus_grounds_blue.jpg
+    yacht  <- map_yacht_upper_deck_blue.jpg    iss    <- map_iss_blue.jpg
+    street <- city_street_blue.jpg
+  Recipe: scale to 1800px on the long edge (320px for thumbnails), take each pixel's brightest channel / 255,
+  raise it to 0.85, and blend from NAVY (10,48,87) to LINE_BLUE (166,199,242) by that amount. Save as JPEG quality 70.
+  The blueprint() function below does the same thing to images a player uploads.
+
+  SHARED GAMES. Published with capabilities {db: {}, room: {}}. One device hosts (the GM) and others join by code.
+  All platform calls live in claudeTransport() in the script. To move to your own hosting, write another object
+  with the same methods (readGame, writeGame, watchGame, watchMarks, writeMark, deleteMark, presence) on top of
+  Firestore, Supabase or a SignalR hub, return it from connect(), and set SHARE_URL to the new address.
+  Data shape: one document per game at games/<CODE> holding the clock (loop, phase, remaining, deadline, speed,
+  won, bg, hostId, origHost, rev, updatedAt in ms), and one document per timestamp at games/<CODE>/marks/<id> ({t, loop, note}).
+  The clock is never ticked over the network: devices count down locally from the shared deadline.
+  Known gaps to close in the real product: the GM role is enforced only in this page, not by the server;
+  devices trust their own clocks, so two devices can differ by their clock offset; uploaded backdrops stay local.
+-->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Londrina+Solid:wght@400;900&display=swap">
+<style>
+[hidden]{display:none !important}   /* the artifact host adds this; our own server doesn't */
+/* Layout: a drawing sheet. The dial is the drawing, the hour's run sheet is the
+   notes column beside it, and a title block runs along the bottom edge. */
+:root{
+  color-scheme: dark;
+  --navy:#0A3057;
+  --navy-deep:#06223F;
+  --line:#A6C7F2;
+  --line-dim:rgba(166,199,242,.34);
+  --line-faint:rgba(166,199,242,.09);
+  --paper:#D8E4EF;
+  --amber:#DEB148;
+  --alarm:#F47C5E;
+  --ink:#0A3057;
+  --flash:#FFFFFF;
+  --shadow:rgba(2,14,28,.65);
+  --scrim:rgba(3,16,32,.62);
+  --display:"Londrina Solid","Arial Narrow",Impact,sans-serif;
+  --mono:"Courier Prime","Courier New",Courier,monospace;
+  --body:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --bg-strength:.4;
+}
+html,body{height:100%}
+body{
+  background:
+    linear-gradient(var(--line-faint) 1px,transparent 1px) 0 0/32px 32px,
+    linear-gradient(90deg,var(--line-faint) 1px,transparent 1px) 0 0/32px 32px,
+    var(--navy);
+  color:var(--paper);
+  font-family:var(--body);
+  font-size:15px;
+  line-height:1.4;
+}
+*{box-sizing:border-box}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+
+.bg{position:fixed;inset:0;z-index:0;background-size:cover;background-position:center;opacity:var(--bg-strength);pointer-events:none}
+.flash{position:fixed;inset:0;z-index:50;background:var(--flash);opacity:0;pointer-events:none}
+.flash.go{animation:flash 2.2s ease-out}
+@keyframes flash{0%{opacity:0}6%{opacity:1}30%{opacity:1}100%{opacity:0}}
+@keyframes flash-soft{0%{opacity:0}30%{opacity:.5}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.flash.go{animation:flash-soft 1.4s ease-out}}
+
+.app{position:relative;z-index:1;min-height:100%;display:grid;grid-template-rows:auto 1fr auto auto;gap:14px;padding-block:14px;padding-inline:clamp(16px,3vw,32px)}
+
+/* top bar */
+.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 18px}
+.wordmark{display:flex;align-items:baseline;gap:10px;margin:0;font-weight:400}
+.wordmark b{font:italic 900 30px/1 var(--display);letter-spacing:.01em;color:var(--paper)}
+.wordmark span{font:700 12px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--amber)}
+.tools{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
+.dock{display:grid;gap:10px;min-width:0}
+.panels{display:contents}
+/* settings open as a centered dialog over a dimmed page */
+.scrim{position:fixed;inset:0;z-index:19;background:var(--scrim);touch-action:none}
+/* while any dialog is open, the page behind it can't scroll */
+html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidden}
+.panel{overscroll-behavior:contain}
+.panel{position:fixed;z-index:20;left:50%;top:50%;transform:translate(-50%,-50%);width:min(720px,calc(100% - 2*clamp(16px,3vw,32px)));max-height:min(84vh,620px);overflow-y:auto;border:1.5px solid var(--line);box-shadow:0 10px 44px var(--shadow)}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.panel-x{width:36px;height:36px;margin:-8px -8px -8px 0;border:1px solid var(--line-dim);background:var(--navy);color:var(--paper);font-size:20px;line-height:1;cursor:pointer;border-radius:0}
+.panel-x:hover{border-color:var(--amber);color:var(--amber)}
+
+.btn{font:700 13px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:12px 18px;border:1.5px solid var(--line);background:var(--navy-deep);color:var(--paper);cursor:pointer;border-radius:0}
+.btn:hover{background:var(--navy)}
+.btn.small{font-size:11px;padding:9px 12px;border-width:1px;border-color:var(--line-dim)}
+.btn.small[aria-expanded="true"],.btn.small[aria-pressed="true"]{border-color:var(--amber);color:var(--amber)}
+.btn.primary{background:var(--amber);border-color:var(--amber);color:var(--ink);font-size:15px;padding:15px 26px;box-shadow:4px 4px 0 var(--navy-deep)}
+.btn.primary:hover{background:var(--paper);border-color:var(--paper)}
+.btn.quiet{border-color:transparent;background:none;color:var(--line);text-decoration:underline;text-underline-offset:3px;padding-inline:8px}
+
+/* drop-down panels */
+.panel{border:1px solid var(--line-dim);background:var(--navy-deep);padding:14px 16px;display:grid;gap:14px}
+.panel h2{margin:0;font:700 11px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--amber)}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.thumb{min-width:0;display:grid;gap:6px;padding:0;border:0;background:none;cursor:pointer;text-align:left}
+.thumb i{display:block;min-width:0;width:100%;aspect-ratio:4/3;border:1.5px solid var(--line-dim);background:var(--navy) center/cover no-repeat}
+.thumb[aria-pressed="true"] i{border-color:var(--amber);box-shadow:3px 3px 0 var(--amber)}
+.thumb span{font:400 12px/1.25 var(--mono);color:var(--paper)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.row label{font:400 13px/1.3 var(--mono)}
+.row input[type=range]{width:min(220px,100%);accent-color:var(--amber)}
+.row select{background:var(--navy);border:1px solid var(--line-dim);padding:8px 10px;font-family:var(--mono);border-radius:0}
+.file{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.file:focus-visible + label{outline:2px solid var(--amber);outline-offset:2px}
+.hint{margin:0;font-size:13px;color:var(--line);max-width:62ch}
+
+/* start screen */
+.landing{display:grid;align-content:center;justify-items:center;gap:26px;padding-block:16px;min-width:0}
+.landing h2{margin:0;font:italic 900 clamp(34px,7vw,64px)/1 var(--display);color:var(--paper);text-align:center;text-wrap:balance}
+.landing-body{display:grid;gap:18px;justify-items:center;width:100%;min-width:0}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;width:min(100%,720px)}
+.choice{display:grid;gap:14px;align-content:start;justify-items:start;padding:18px;background:rgba(6,34,63,.9);border:1.5px solid var(--line);min-width:0}
+.choice h3{margin:0;font:700 12px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--amber)}
+.choice p{margin:0;font-size:15px;color:var(--paper)}
+.choice form{display:flex;flex-wrap:wrap;gap:10px}
+.choice input{min-width:0;width:6.5em;background:var(--navy);border:1.5px solid var(--line);padding:12px 12px;font:700 18px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--paper);border-radius:0}
+.choice input::placeholder{color:var(--line);opacity:.55}
+.landing .sub{margin:0;font-size:14px;color:var(--line);text-align:center;max-width:56ch}
+.solo-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 14px;font-size:14px;color:var(--line)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.btn:disabled{opacity:.45;cursor:default}
+@media (max-width:700px){.choices{grid-template-columns:minmax(0,1fr)}}
+/* phones: the tool buttons share one row equally */
+@media (max-width:600px){
+  .has-toast .app{padding-bottom:170px}
+  /* keep the clock buttons on one line so the row never changes height */
+  .actions{gap:8px}
+  .actions .btn{font-size:clamp(10px,3.1vw,12px);padding:12px clamp(6px,2.4vw,12px);letter-spacing:.04em;white-space:nowrap}
+  .actions .btn.primary{font-size:clamp(11px,3.4vw,13px);padding:14px clamp(8px,3vw,14px);box-shadow:3px 3px 0 var(--navy-deep)}
+  .actions .btn.quiet{padding-inline:4px}
+  .tools{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px}
+  .tools .btn.small{padding:11px 2px;font-size:clamp(9px,2.7vw,11px);letter-spacing:.04em;white-space:nowrap;text-align:center;overflow:hidden}
+}
+
+/* shared game */
+.chip{font:700 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;padding:9px 12px;border:1px solid var(--amber);background:var(--navy-deep);color:var(--amber);cursor:pointer;border-radius:0}
+.chip:hover{background:var(--navy)}
+.share{display:grid;gap:14px}
+.share input{min-width:0;background:var(--navy);border:1px solid var(--line-dim);padding:8px 10px;font:400 14px/1.2 var(--mono);color:var(--paper);border-radius:0}
+.share #join-code{width:6.5em;text-transform:uppercase;letter-spacing:.2em}
+.share #share-link{flex:1 1 220px}
+.linkbtn{min-width:0;text-align:left;font:400 14px/1.2 var(--mono);color:var(--paper);background:var(--navy);border:1px solid var(--line-dim);padding:8px 10px;cursor:pointer;border-radius:0;overflow-wrap:anywhere}
+.linkbtn:hover{border-color:var(--amber);color:var(--amber)}
+.row .lbl{font:400 13px/1.3 var(--mono)}
+.code-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 24px}
+.code{font:900 54px/1 var(--display);letter-spacing:.12em;color:var(--amber)}
+.share .tb-k{display:block;margin-bottom:6px}
+.thumbs.locked .thumb{cursor:default}
+.mark-t[readonly],.mark-note[readonly]{border-bottom-color:transparent}
+
+/* main sheet */
+.sheet{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,360px);gap:24px;align-items:center;min-height:0}
+.stage{display:flex;flex-direction:column;align-items:center;gap:16px;min-width:0}
+
+.dial{position:relative;width:min(100%,58vh,520px);aspect-ratio:1;max-width:100%;container-type:inline-size}
+.dial svg{display:block;width:100%;height:100%;overflow:visible}
+.backing{fill:var(--navy-deep);fill-opacity:.9}
+.ring{fill:none;stroke:var(--line-dim);stroke-width:1.5}
+.arc{fill:none;stroke:var(--line);stroke-width:6}
+.inner{fill:none;stroke:var(--line-dim);stroke-width:1}
+.centerline{fill:none;stroke:var(--line-dim);stroke-width:1;stroke-dasharray:14 4 2 4}
+.tick{stroke:var(--line);stroke-width:1}
+.tick.major{stroke-width:2}
+.ticklabel{fill:var(--line);font:700 11px var(--mono);text-anchor:middle;dominant-baseline:central}
+.pointer{fill:var(--amber)}
+.dialmark{fill:var(--amber);stroke:var(--navy-deep);stroke-width:1.5}
+.dialmark.old{fill:var(--navy-deep);stroke:var(--amber)}
+
+.readout{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1cqw;pointer-events:none}
+.readout small{font:700 3.3cqw/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--line)}
+.digits{display:flex;font:400 23cqw/1 var(--display);color:var(--paper)}
+.digits span{width:.5em;text-align:center}
+.digits i{width:.26em;text-align:center;font-style:normal}
+.dial[data-heat="warm"] .digits{color:var(--amber)}
+.dial[data-heat="warm"] .arc{stroke:var(--amber)}
+.dial[data-heat="hot"] .digits{color:var(--alarm);animation:pulse 1s ease-in-out infinite}
+.dial[data-heat="hot"] .arc{stroke:var(--alarm)}
+.dial[data-phase="paused"] .digits{animation:blink 1.4s steps(2,start) infinite}
+@keyframes pulse{50%{transform:scale(1.04)}}
+@keyframes blink{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.dial .digits{animation:none!important}}
+.stamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-9deg);font:900 17cqw/1.15 var(--display);letter-spacing:.04em;white-space:nowrap;color:var(--alarm);border:.9cqw solid currentColor;padding:0 3.5cqw;background:var(--navy-deep)}
+.stamp.win{color:var(--amber)}
+
+/* status toast: floats above the bottom buttons so nothing on the page moves when it comes and goes */
+.caption{position:fixed;z-index:15;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 64px);transform:translateX(-50%);animation:toast-in .18s ease-out;width:min(460px,calc(100% - 32px));background:var(--paper);color:var(--ink);font:400 15px/1.35 var(--mono);padding:10px 14px 11px;box-shadow:5px 5px 0 var(--amber)}
+.caption b{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:3px}
+.caption p{margin:0}
+@keyframes toast-in{from{opacity:0;transform:translate(-50%,8px)}}
+@media (prefers-reduced-motion:reduce){.caption{animation:none}}
+.cap-acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:9px}
+.cap-acts:empty{display:none}
+.caption{padding-right:44px}
+.toast-x{position:absolute;top:4px;right:4px;width:34px;height:34px;border:0;background:none;color:var(--ink);font-size:22px;line-height:1;cursor:pointer;border-radius:0}
+.toast-x:hover{background:rgba(10,48,87,.1)}
+.cap-btn.ghost{background:none;color:var(--ink);text-decoration:underline;text-underline-offset:3px;padding-inline:4px}
+.cap-btn{font:700 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:9px 12px;border:0;background:var(--ink);color:var(--paper);cursor:pointer;border-radius:0}
+.cap-btn:hover{background:var(--navy-deep)}
+
+.actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 12px;min-height:50px}
+.confirm{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 12px;font:400 14px/1.3 var(--mono);text-align:center}
+
+/* run sheet */
+.log{align-self:stretch;display:flex;flex-direction:column;min-width:0;min-height:0;max-height:calc(58vh + 170px);background:rgba(6,34,63,.9);border:1px solid var(--line-dim)}
+.log header{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line-dim)}
+.log h2{margin:0;font:700 12px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--amber)}
+.log header span{font:400 12px/1 var(--mono);color:var(--line)}
+.marks{list-style:none;margin:0;padding:6px 0;display:flex;flex-direction:column;overflow-y:auto;min-height:0}
+.mark{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:10px;padding:5px 8px 5px 14px}
+.mark-t{font:400 22px/1 var(--display);color:var(--amber);font-variant-numeric:tabular-nums;width:2.7em;min-width:0;background:none;border:0;border-bottom:1px dashed var(--line-dim);padding:4px 0;border-radius:0}
+.mark-note{display:block;min-width:0;width:100%;background:none;border:0;border-bottom:1px dashed var(--line-dim);padding:6px 2px;font:400 14px/1.25 var(--mono);color:var(--paper);border-radius:0;resize:none;overflow:hidden;field-sizing:content}
+.mark-note::placeholder{color:var(--line);opacity:.7}
+.mark-loop{font:700 10px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--line);border:1px solid var(--line-dim);padding:4px 5px}
+.mark .x{width:30px;height:30px;border:0;background:none;color:var(--line);font-size:18px;line-height:1;cursor:pointer}
+.mark .x:hover{color:var(--alarm)}
+.mark.passed{opacity:.45}
+.mark.soon{background:rgba(222,177,72,.16)}
+.now{display:flex;align-items:center;gap:10px;padding:4px 14px;font:700 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--paper)}
+.now::after{content:"";flex:1;border-top:1.5px solid var(--paper)}
+.empty{margin:0;padding:14px;font-size:14px;color:var(--line)}
+.log footer{padding:10px 14px;border-top:1px solid var(--line-dim);font-size:12.5px;color:var(--line)}
+.add{display:grid;grid-template-columns:4.6em minmax(0,1fr) auto;gap:8px;padding:10px 14px;border-top:1px solid var(--line-dim)}
+.add legend,.add label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.add h3{grid-column:1/-1;margin:0;font:700 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--line)}
+.add input,.add select{min-width:0;width:100%;background:var(--navy);border:1px solid var(--line-dim);padding:8px;font:400 14px/1.2 var(--mono);color:var(--paper);border-radius:0}
+.add #add-note,.add #add-loop{grid-column:span 2}
+.add #add-loop{grid-column:1/span 2}
+.add input::placeholder{color:var(--line);opacity:.7}
+.add-err{grid-column:1/-1;margin:0;font-size:12.5px;color:var(--alarm)}
+#add{display:flex}
+/* timestamp rows open the editor */
+.mark{display:block;padding:0}
+.mark-open{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;width:100%;padding:7px 14px;background:none;border:0;border-radius:0;text-align:left;color:inherit;cursor:pointer}
+.mark-open:hover:not(:disabled){background:rgba(166,199,242,.08)}
+.mark-open:disabled{cursor:default}
+.mark-open .mark-t{display:block;width:auto;min-width:2.6em;border:0;padding:0}
+.mark-open .mark-note{border:0;padding:0;font:400 14px/1.3 var(--mono);color:var(--paper);overflow-wrap:anywhere}
+.mark-open .mark-note.blank{color:var(--line);font-style:italic}
+/* timestamp editor */
+#panel-mark{width:min(460px,calc(100% - 32px))}
+.mk{display:grid;gap:14px}
+.mk-top{display:flex;flex-wrap:wrap;gap:12px}
+.fld{display:grid;gap:6px;min-width:0}
+.mk label{font:700 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--line)}
+.mk input,.mk select,.mk textarea{min-width:0;background:var(--navy);border:1px solid var(--line-dim);padding:10px;font:400 16px/1.3 var(--mono);color:var(--paper);border-radius:0}
+.mk #mk-t{width:4.4em;font:400 28px/1 var(--display);color:var(--amber);padding:8px 10px}
+.mk select{height:100%}
+.mk textarea{resize:vertical;min-height:4.6em;width:100%}
+.mk-btns{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.mk-del{margin-left:auto}
+
+/* title block */
+.titleblock{display:grid;grid-template-columns:minmax(0,2.2fr) repeat(4,minmax(0,1fr));border:1.5px solid var(--line);background:rgba(6,34,63,.9)}
+.tb{display:grid;gap:4px;padding:8px 12px;box-shadow:inset 0 0 0 .5px var(--line-dim);min-width:0}
+.tb-k{font:700 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--line)}
+.tb-v{font:400 14px/1.2 var(--mono);color:var(--paper);overflow-wrap:anywhere}
+.tb.on{box-shadow:inset 0 3px 0 var(--amber),inset 0 0 0 .5px var(--line-dim)}
+.tb.on .tb-v{color:var(--amber);font-weight:700}
+.tb-sheet{order:5}
+
+@media (max-width:860px){
+  .sheet{grid-template-columns:minmax(0,1fr);align-items:start}
+  .log{max-height:none}
+  .marks{overflow:visible}
+  .dial{width:min(100%,440px)}
+  .titleblock{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .tb-project{grid-column:span 2}
+  .tb-sheet{order:0}
+  .wordmark b{font-size:26px}
+  #btn-full{display:none}
+}
+</style>
+
+<div class="bg" id="bg"></div>
+<div class="flash" id="flash"></div>
+
+<div class="app">
+  <div class="bar">
+    <h1 class="wordmark"><b>Shenan-Again</b><span>Loop timer</span></h1>
+    <button class="chip" id="chip" hidden></button>
+  </div>
+
+  <section class="landing" id="landing" hidden>
+    <h2>Three loops. One hour each.</h2>
+    <div class="landing-body" id="landing-body"></div>
+  </section>
+
+  <main class="sheet" id="sheet">
+    <div class="stage">
+      <div class="dial" id="dial">
+        <svg viewBox="-210 -210 420 420" aria-hidden="true">
+          <circle r="199" class="backing"/>
+          <path class="centerline" d="M-208 0H-132M132 0H208M0-208V-132M0 132V208"/>
+          <g id="ticks"></g>
+          <circle r="176" class="ring"/>
+          <circle r="176" class="arc" id="arc" transform="rotate(-90)"/>
+          <circle r="128" class="inner"/>
+          <g id="dialmarks"></g>
+          <g id="pointer"><path class="pointer" d="M0-181L-7-196H7Z"/></g>
+        </svg>
+        <div class="readout" id="readout" role="timer">
+          <small id="loop-label">Loop 1 of 3</small>
+          <div class="digits" id="digits"><span>6</span><span>0</span><i>:</i><span>0</span><span>0</span></div>
+          <small>On the clock</small>
+        </div>
+        <div class="stamp" id="stamp" hidden></div>
+      </div>
+
+      <div class="actions" id="actions"></div>
+      <div class="caption" id="caption" aria-live="polite" hidden><button class="toast-x" id="toast-x" aria-label="Dismiss this message" hidden>×</button><b id="cap-k"></b><p id="cap-v"></p><div class="cap-acts" id="cap-acts"></div></div>
+    </div>
+
+    <aside class="log" aria-label="Timestamps">
+      <header><h2>Timestamps</h2><span id="mark-count"></span></header>
+      <ul class="marks" id="marks"></ul>
+      <p class="empty" id="empty">Nothing marked yet. When something happens that the crew can use next loop, mark it.</p>
+      <div class="add" id="add"><button class="btn small" id="btn-add" type="button">Add a timestamp by hand</button></div>
+      <footer>Marks carry over between loops. The clock warns you two minutes before each one comes round again.</footer>
+    </aside>
+  </main>
+
+  <footer class="titleblock" id="titleblock">
+    <div class="tb tb-project"><span class="tb-k">Project</span><span class="tb-v">Shenan-Again: The Time Loop Heist Game</span></div>
+    <div class="tb tb-sheet"><span class="tb-k">Sheet</span><span class="tb-v" id="tb-sheet">1 of 3</span></div>
+    <div class="tb" id="tb-1"><span class="tb-k">Loop 1</span><span class="tb-v"></span></div>
+    <div class="tb" id="tb-2"><span class="tb-k">Loop 2</span><span class="tb-v"></span></div>
+    <div class="tb" id="tb-3"><span class="tb-k">Loop 3 &middot; final</span><span class="tb-v"></span></div>
+  </footer>
+
+  <div class="dock" id="dock">
+  <div class="scrim" id="scrim" hidden></div>
+  <div class="panels">
+      <section class="panel" id="panel-bg" hidden>
+        <div class="panel-head"><h2>Backdrop</h2><button class="panel-x" data-close aria-label="Close backdrop settings">×</button></div>
+        <div class="thumbs" id="thumbs"></div>
+        <div class="row">
+          <input class="file" type="file" id="bg-file" accept="image/*">
+          <label class="btn small" for="bg-file" id="bg-upload">Add your own image</label>
+          <label for="bg-strength">Strength</label>
+          <input type="range" id="bg-strength" min="12" max="100" step="1" value="40">
+        </div>
+        <p class="hint" id="bg-hint"></p>
+      </section>
+      <section class="panel" id="panel-mark" role="dialog" aria-modal="true" aria-labelledby="mk-title" hidden>
+        <div class="panel-head"><h2 id="mk-title">New timestamp</h2><button class="panel-x" data-close aria-label="Discard and close">×</button></div>
+        <form class="mk" id="mk-form" novalidate>
+          <div class="mk-top">
+            <div class="fld"><label for="mk-t">Clock reading</label><input id="mk-t" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="14:00"></div>
+            <div class="fld"><label for="mk-loop">Happened in</label><select id="mk-loop"></select></div>
+          </div>
+          <div class="fld"><label for="mk-note">What happened</label><textarea id="mk-note" rows="3" maxlength="120" placeholder="e.g. guard leaves the gate"></textarea></div>
+          <p class="add-err" id="mk-err" role="alert" hidden>Enter what the clock read, in minutes and seconds, like 14:00.</p>
+          <div class="mk-btns"><button class="btn primary" type="submit">Save</button><button class="btn quiet" type="button" data-close>Cancel</button><button class="btn small mk-del" type="button" id="mk-del">Delete</button></div>
+        </form>
+      </section>
+      <section class="panel" id="panel-share" hidden>
+        <div class="panel-head"><h2>Game</h2><button class="panel-x" data-close aria-label="Close game panel">×</button></div>
+        <div class="share" id="share-body"></div>
+      </section>
+    </div>
+    <div class="tools">
+      <button class="btn small" id="btn-share" aria-expanded="false" aria-controls="panel-share">Share game</button>
+      <button class="btn small" id="btn-bg" aria-expanded="false" aria-controls="panel-bg">Backdrop</button>
+      <button class="btn small" id="btn-sound" aria-pressed="true">Sound on</button>
+      <button class="btn small" id="btn-full">Full screen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var TEST = /[?&]test\b/.test(location.search);   // ?test in the address shows the clock-speed setting
+  var SKEW = 0;   // add to Date.now() to get server time; set by the self-hosted transport
+  function nowMs(){ return Date.now() + SKEW; }
+  var HOUR = 3600, KEY = 'shenan-timer-v1', C = 2 * Math.PI * 176, GRACE = 30000;
+  var SHARE_URL = 'https://claude.ai/artifact/Ezgp29R9uCECGqWPBxJXAZ';
+  var PHASES = ['ready', 'running', 'paused', 'caught', 'won'];
+  var GAME_KEYS = ['loop', 'phase', 'remaining', 'deadline', 'speed', 'won', 'bg', 'hostId', 'origHost', 'rev'];
+  var $ = function(id){ return document.getElementById(id); };
+  var BGS = [
+    {id:'grid',   name:'Blank sheet'},
+    {id:'vault',  name:'The vault', src:'bg/vault.jpg', thumb:'bg/vault_t.jpg'},
+    {id:'circus', name:'Clowning Around', src:'bg/circus.jpg', thumb:'bg/circus_t.jpg'},
+    {id:'yacht',  name:'Yacht-zee', src:'bg/yacht.jpg', thumb:'bg/yacht_t.jpg'},
+    {id:'iss',    name:'Around the World in Ninety Minutes', src:'bg/iss.jpg', thumb:'bg/iss_t.jpg'},
+    {id:'street', name:'City street', src:'bg/street.jpg', thumb:'bg/street_t.jpg'}
+  ];
+
+  // S is the game (clock + marks). P is this device's own settings. net is the shared-game connection.
+  var S, P, custom = null, confirming = null, alerted = {}, last = {}, cache = {}, ac = null;
+  var net = {t:null, ready:false, cannotWrite:false, code:null, status:'solo', synced:false, readOnly:false,
+             peers:null, hostGoneSince:null, subs:[], room:null, msg:'', warn:false, busy:''};
+
+  /* ================= sync transport =================
+     The only code that talks to the hosting platform. To move off Claude artifacts, write another
+     object with these same methods and return it from connect(). Nothing else needs to change. */
+  function claudeTransport(db, room){
+    return {
+      readGame: function(code){
+        return db.doc('games/' + code).get().then(function(s){ return s.exists ? s.data() : null; });
+      },
+      writeGame: function(code, game){ return db.doc('games/' + code).set(game); },
+      // cb(game or null, provisional). provisional = not yet confirmed by the server.
+      watchGame: function(code, cb, fail){
+        return db.doc('games/' + code).onSnapshot(function(s){
+          cb(s.exists ? s.data() : null, !!(s.metadata && s.metadata.fromCache));
+        }, fail);
+      },
+      watchMarks: function(code, cb, fail){
+        return db.collection('games/' + code + '/marks').limit(500).onSnapshot(function(q){
+          cb(q.docs.map(function(d){ return Object.assign({}, d.data(), {id:d.id}); }), !!(q.metadata && q.metadata.fromCache));
+        }, fail);
+      },
+      writeMark: function(code, m){ return db.doc('games/' + code + '/marks/' + m.id).set({t:m.t, loop:m.loop, note:m.note}); },
+      deleteMark: function(code, id){ return db.doc('games/' + code + '/marks/' + id).delete(); },
+      // Who has this game open right now. cb(list of device ids, or null when this view can't tell).
+      // Resolves {leave()} or null when presence isn't available.
+      presence: function(code, me, cb){
+        if (!room) return Promise.resolve(null);
+        return room.join('g-' + code.toLowerCase()).then(function(r){
+          var up = true, list = [];
+          var emit = function(){ cb(up ? list : null); };
+          var offPeers = r.onPeers(function(ch){
+            list = ch.peers.map(function(p){ return p.presence && p.presence.device; }).filter(Boolean);
+            emit();
+          }, function(){ up = false; emit(); });
+          var offConn = r.onConnection(function(c){ up = c; emit(); }, function(){});
+          r.presence({device: me}).catch(function(){});
+          return {leave: function(){ try { offPeers(); offConn(); r.leave().catch(function(){}); } catch(e){} }};
+        }).catch(function(){ return null; });
+      }
+    };
+  }
+
+
+  /* Transport for our own server (server.mjs). One WebSocket, reconnects by itself, and re-subscribes after a drop. */
+  function wsTransport(device){
+    var sock = null, open = false, nextId = 1, pending = {}, queue = [], backoff = 500;
+    var gameCbs = {}, markCbs = {}, peerCbs = {}, failCbs = {}, joined = {};
+    var tick = function(map, code, fn){ (map[code] || []).slice().forEach(fn); };
+    function fail(rid, code){ var p = pending[rid]; if (p) { delete pending[rid]; p.reject({code: code}); } }
+    function send(msg){
+      return new Promise(function(resolve, reject){
+        var rid = nextId++; msg.rid = rid;
+        pending[rid] = {resolve: resolve, reject: reject};
+        var go = function(){ try { sock.send(JSON.stringify(msg)); } catch(e){ fail(rid, 'unavailable'); } };
+        if (open) go(); else { queue.push(go); connect(); }
+        setTimeout(function(){ fail(rid, 'unavailable'); }, 10000);
+      });
+    }
+    function resubscribe(){
+      Object.keys(gameCbs).concat(Object.keys(markCbs)).filter(function(c, i, a){ return a.indexOf(c) === i; })
+        .forEach(function(c){ sock.send(JSON.stringify({op:'watch', code:c, rid:nextId++})); });
+      Object.keys(joined).forEach(function(c){ sock.send(JSON.stringify({op:'join', code:c, rid:nextId++})); });
+    }
+    function connect(){
+      if (sock && sock.readyState <= 1) return;
+      var url = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws';
+      sock = new WebSocket(url); open = false;
+      sock.onopen = function(){
+        var t0 = Date.now(), rid = nextId++;
+        pending[rid] = {resolve: function(r){
+          if (r && r.now) SKEW = r.now - (t0 + Date.now()) / 2;
+          open = true; backoff = 500;
+          resubscribe();
+          var q = queue; queue = []; q.forEach(function(f){ f(); });
+        }, reject: function(){ try { sock.close(); } catch(e){} }};
+        sock.send(JSON.stringify({op:'hello', device: device, rid: rid}));
+      };
+      sock.onmessage = function(e){
+        var m; try { m = JSON.parse(e.data); } catch(x){ return; }
+        if (m.rid && pending[m.rid]) {
+          var p = pending[m.rid]; delete pending[m.rid];
+          if (m.ok) p.resolve(m); else p.reject({code: m.code});
+        } else if (m.ev === 'game') tick(gameCbs, m.code, function(f){ f(m.game, false); });
+        else if (m.ev === 'marks') tick(markCbs, m.code, function(f){ f(m.marks, false); });
+        else if (m.ev === 'peers') tick(peerCbs, m.code, function(f){ f(m.list); });
+      };
+      sock.onclose = function(){
+        open = false; queue = [];
+        Object.keys(pending).forEach(function(r){ fail(r, 'unavailable'); });
+        Object.keys(failCbs).forEach(function(c){ tick(failCbs, c, function(f){ f({code:'unavailable'}); }); });
+        Object.keys(peerCbs).forEach(function(c){ tick(peerCbs, c, function(f){ f(null); }); });
+        if (Object.keys(gameCbs).length || Object.keys(markCbs).length || Object.keys(joined).length) {
+          setTimeout(connect, backoff); backoff = Math.min(8000, backoff * 2);
+        }
+      };
+    }
+    function add(map, code, fn){ (map[code] = map[code] || []).push(fn); }
+    function del(map, code, fn){
+      map[code] = (map[code] || []).filter(function(f){ return f !== fn; });
+      if (!map[code].length) delete map[code];
+      if (!gameCbs[code] && !markCbs[code] && !joined[code]) send({op:'unwatch', code:code}).catch(function(){});
+    }
+    return {
+      readGame: function(code){ return send({op:'read', code:code}).then(function(r){ return r.data; }); },
+      writeGame: function(code, game){ return send({op:'write', code:code, game:game}); },
+      watchGame: function(code, cb, failFn){
+        add(gameCbs, code, cb); add(failCbs, code, failFn);
+        send({op:'watch', code:code}).catch(function(e){ failFn(e); });
+        return function(){ del(gameCbs, code, cb); (failCbs[code] = (failCbs[code] || []).filter(function(f){ return f !== failFn; })); };
+      },
+      watchMarks: function(code, cb){
+        add(markCbs, code, cb);
+        return function(){ del(markCbs, code, cb); };
+      },
+      writeMark: function(code, m){ return send({op:'wmark', code:code, id:m.id, mark:{t:m.t, loop:m.loop, note:m.note}}); },
+      deleteMark: function(code, id){ return send({op:'dmark', code:code, id:id}); },
+      presence: function(code, me, cb){
+        joined[code] = true; add(peerCbs, code, cb);
+        return send({op:'join', code:code}).then(function(){
+          return {leave: function(){
+            var left = peerCbs[code]; delete joined[code];
+            peerCbs[code] = (left || []).filter(function(f){ return f !== cb; }); if (!peerCbs[code].length) delete peerCbs[code];
+            if (!gameCbs[code] && !markCbs[code]) send({op:'unwatch', code:code}).catch(function(){});
+          }};
+        }).catch(function(){ delete joined[code]; return null; });
+      }
+    };
+  }
+
+  /* ================= state ================= */
+  function rid(){ return Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4); }
+  function clampInt(v, lo, hi, d){ v = Math.round(+v); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; }
+  function fresh(){
+    return {loop:1, phase:'ready', remaining:HOUR*1000, deadline:null, speed:1, won:null, bg:'vault',
+            hostId:null, origHost:null, rev:0, marks:[]};
+  }
+  // Everything read from storage or from other devices goes through these two.
+  function cleanGame(g){
+    var o = {};
+    o.loop = clampInt(g.loop, 1, 3, 1);
+    o.phase = PHASES.indexOf(g.phase) >= 0 ? g.phase : 'ready';
+    o.remaining = clampInt(g.remaining, 0, HOUR*1000, HOUR*1000);
+    o.deadline = typeof g.deadline === 'number' && isFinite(g.deadline) ? g.deadline : null;
+    if (o.phase === 'running' && o.deadline === null) o.phase = 'paused';
+    o.speed = [1, 10, 60].indexOf(g.speed) >= 0 ? g.speed : 1;
+    o.won = g.won == null ? null : clampInt(g.won, 0, HOUR, 0);
+    o.bg = BGS.some(function(b){ return b.id === g.bg; }) ? g.bg : 'vault';
+    o.hostId = typeof g.hostId === 'string' ? g.hostId.slice(0, 40) : null;
+    o.origHost = typeof g.origHost === 'string' ? g.origHost.slice(0, 40) : null;
+    o.rev = typeof g.rev === 'number' && isFinite(g.rev) ? g.rev : 0;
+    return o;
+  }
+  function cleanMark(m){
+    var id = String(m && m.id);
+    if (!m || !/^[A-Za-z0-9_-]{1,40}$/.test(id)) return null;
+    return {id:id, t:clampInt(m.t, 0, HOUR, 0), loop:clampInt(m.loop, 0, 3, 1),
+            note:String(m.note == null ? '' : m.note).replace(/\n/g, ' ').slice(0, 120)};
+  }
+  function normalize(o){
+    var s = Object.assign(fresh(), cleanGame(o));
+    s.hostId = null; s.origHost = null;
+    s.marks = (Array.isArray(o.marks) ? o.marks : []).map(cleanMark).filter(Boolean);
+    return s;
+  }
+  function loadSolo(){
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) { var o = JSON.parse(raw); if (o && o.loop) return normalize(o); }
+    } catch(e){}
+    return fresh();
+  }
+  function hasSoloSave(){
+    try {
+      var o = JSON.parse(localStorage.getItem(KEY) || 'null');
+      return !!(o && o.loop && (o.loop > 1 || o.phase !== 'ready' || (o.marks && o.marks.length)));
+    } catch(e){ return false; }
+  }
+  // The hour ran out while the page was closed.
+  function settleExpired(){
+    if (S.phase !== 'running' || remainingMs() > 0) return;
+    if (S.loop < 3) { S.loop += 1; S.phase = 'ready'; S.remaining = HOUR * 1000; }
+    else { S.phase = 'caught'; S.remaining = 0; }
+    S.deadline = null; saveLocal();
+  }
+  function saveLocal(){ if (net.code || P.mode !== 'solo') return; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+  function loadPrefs(){
+    var p = {sound:true, strength:40, useCustom:false, code:null, mode:null};
+    try {
+      var raw = localStorage.getItem(KEY + '-prefs');
+      if (raw) Object.assign(p, JSON.parse(raw));
+      else {
+        var old = JSON.parse(localStorage.getItem(KEY) || 'null');
+        if (old) {
+          if (typeof old.sound === 'boolean') p.sound = old.sound;
+          if (typeof old.strength === 'number') p.strength = old.strength;
+          if (old.bg === 'custom') p.useCustom = true;
+        }
+      }
+    } catch(e){}
+    // Device identity is per tab, so two tabs in one browser count as two devices.
+    p.device = null;
+    try {
+      p.device = sessionStorage.getItem(KEY + '-device');
+      if (!p.device) { p.device = rid(); sessionStorage.setItem(KEY + '-device', p.device); }
+    } catch(e){ p.device = p.device || rid(); }
+    return p;
+  }
+  function savePrefs(){
+    try { localStorage.setItem(KEY + '-prefs', JSON.stringify({sound:P.sound, strength:P.strength, useCustom:P.useCustom, code:P.code, mode:P.mode})); } catch(e){}
+  }
+
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function fmt(s){ return pad(Math.floor(s/60)) + ':' + pad(s % 60); }
+  function esc(t){ return String(t).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function remainingMs(){ return S.phase === 'running' ? Math.max(0, (S.deadline - nowMs()) * S.speed) : S.remaining; }
+  function secs(){ return Math.ceil(remainingMs() / 1000); }
+  function findMark(id){ return S.marks.filter(function(m){ return m.id === id; })[0]; }
+  function parseClock(str){
+    var m = /^(\d{1,2})(?::(\d{1,2}))?$/.exec(String(str).trim());
+    var t = m ? (+m[1]) * 60 + (+(m[2] || 0)) : -1;
+    return (!m || +(m[2] || 0) > 59 || t > HOUR) ? -1 : t;
+  }
+
+  /* ================= roles ================= */
+  // On the start screen until a game is hosted, joined or started solo.
+  function inGame(){ return !!net.code || P.mode === 'solo'; }
+  function live(){ return !!net.code && net.status === 'live'; }
+  // The GM: whoever holds the clock. Solo play is always the GM.
+  function canControl(){ return !net.code || (live() && !net.readOnly && S.hostId === P.device); }
+  // Anyone who may add and edit timestamps.
+  function canWrite(){ return !net.code || (live() && !net.readOnly); }
+  function hostHere(){ return !!net.peers && net.peers.indexOf(S.hostId) >= 0; }
+  function takeoverOffered(){
+    return live() && !net.readOnly && S.hostId !== P.device && !!net.peers &&
+           !!net.hostGoneSince && Date.now() - net.hostGoneSince > GRACE;
+  }
+  function evalHost(){
+    if (!net.peers || hostHere()) net.hostGoneSince = null;
+    else if (!net.hostGoneSince) net.hostGoneSince = Date.now();
+  }
+
+  /* ================= saving ================= */
+  // updatedAt lets a cleanup job find games nobody has touched in a while.
+  function gameDoc(){ var g = {}; GAME_KEYS.forEach(function(k){ g[k] = S[k]; }); g.updatedAt = Date.now(); return g; }
+  function writeFailed(e){
+    var code = e && e.code;
+    if (code === 'invalid_argument' || code === 'not_granted' || code === 'revoked') net.readOnly = true;
+    else { net.warn = true; setTimeout(function(){ net.warn = false; renderChip(); }, 6000); }
+    render();
+  }
+  // One write at a time; if more changes pile up meanwhile, only the latest state is sent.
+  var gameWriting = false, gameDirty = false;
+  function pushGame(){
+    gameDirty = true;
+    if (gameWriting || !net.code) return;
+    gameWriting = true; gameDirty = false;
+    var done = function(){ gameWriting = false; if (gameDirty && net.code) pushGame(); };
+    net.t.writeGame(net.code, gameDoc()).then(done, function(e){ writeFailed(e); done(); });
+  }
+  // Call after any change to the clock, backdrop or speed.
+  function commit(){
+    S.rev = (S.rev || 0) + 1;
+    if (net.code) pushGame(); else saveLocal();
+  }
+  // Timestamps save one document each, so two people marking at once never overwrite each other.
+  var markTimers = {}, markChain = {}, dirty = {}, gone = {};
+  function flushMark(id){
+    clearTimeout(markTimers[id]); delete markTimers[id];
+    var m = findMark(id), code = net.code;
+    if (!m || !code) { delete dirty[id]; return; }
+    var snap = {id:m.id, t:m.t, loop:m.loop, note:m.note};
+    markChain[id] = (markChain[id] || Promise.resolve()).then(function(){ return net.t.writeMark(code, snap); })
+      .then(function(){ if (!markTimers[id]) delete dirty[id]; }, function(e){ delete dirty[id]; writeFailed(e); });
+  }
+  function saveMark(m, now){
+    if (!net.code) { saveLocal(); return; }
+    dirty[m.id] = true;
+    clearTimeout(markTimers[m.id]);
+    if (now) flushMark(m.id); else markTimers[m.id] = setTimeout(function(){ flushMark(m.id); }, 700);
+  }
+  function removeMark(id){
+    S.marks = S.marks.filter(function(m){ return m.id !== id; });
+    clearTimeout(markTimers[id]); delete markTimers[id]; delete dirty[id];
+    if (net.code) {
+      var code = net.code; gone[id] = Date.now();
+      markChain[id] = (markChain[id] || Promise.resolve()).then(function(){ return net.t.deleteMark(code, id); }).catch(writeFailed);
+    } else saveLocal();
+    render();
+  }
+
+  /* ================= shared games ================= */
+  function makeCode(){
+    var abc = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', c = '';
+    for (var i = 0; i < 4; i++) c += abc[Math.floor(Math.random() * abc.length)];
+    return c;
+  }
+  function hashCode(){
+    var m = /^#([A-Za-z0-9]{4})$/.exec(location.hash || '');
+    if (!m) return null;
+    var code = m[1].toUpperCase();
+    try { if (sessionStorage.getItem(KEY + '-left') === code) return null; } catch(e){}
+    return code;
+  }
+  function teardown(){
+    net.subs.forEach(function(off){ try { off(); } catch(e){} });
+    net.subs = [];
+    if (net.room) { net.room.leave(); net.room = null; }
+    net.peers = null; net.hostGoneSince = null;
+    Object.keys(markTimers).forEach(function(id){ clearTimeout(markTimers[id]); });
+    markTimers = {}; dirty = {}; gone = {}; gameDirty = false;
+  }
+  function applyGame(g, provisional){
+    if (!net.code) return;
+    if (!g) { if (!provisional && net.synced) leaveGame('That game no longer exists.'); return; }
+    var next = cleanGame(g);
+    if (net.synced && next.rev < S.rev) return;                                   // an older write arriving late
+    if (net.synced && next.rev === S.rev && next.hostId === S.hostId && S.hostId === P.device) {   // our own echo
+      if (net.status !== 'live') { net.status = 'live'; render(); }                                   // ...which also means the connection is back
+      return;
+    }
+    var prev = {loop:S.loop, phase:S.phase}, first = !net.synced;
+    Object.assign(S, next);
+    net.synced = true; net.status = 'live'; confirming = null;
+    if (!first) {
+      if (S.loop > prev.loop) { flash(); sfx('reset'); }
+      if (S.loop !== prev.loop) alerted = {};
+      if (S.phase === 'caught' && prev.phase !== 'caught') sfx('caught');
+      if (S.phase === 'won' && prev.phase !== 'won') sfx('won');
+    }
+    if (S.phase === 'running') wake();
+    evalHost();
+    render();
+  }
+  function applyMarks(list){
+    if (!net.code) return;
+    var seen = {}, out = [], now = Date.now();
+    list.map(cleanMark).filter(Boolean).forEach(function(m){
+      if (gone[m.id] && now - gone[m.id] < 10000) return;     // we just deleted it
+      seen[m.id] = true;
+      out.push(dirty[m.id] && findMark(m.id) ? findMark(m.id) : m);   // keep what's being typed here
+    });
+    S.marks.forEach(function(m){ if (dirty[m.id] && !seen[m.id]) out.push(m); });
+    S.marks = out;
+    render();
+  }
+  function subFail(e){
+    var code = e && e.code;
+    if (code === 'revoked' || code === 'not_granted') { leaveGame('This view lost access to that game.'); return; }
+    net.status = 'error'; render();
+  }
+  function enter(code, keepState){
+    teardown();
+    net.code = code; net.status = keepState ? 'live' : 'connecting'; net.synced = !!keepState;
+    net.readOnly = net.cannotWrite; net.msg = '';
+    if (!keepState) { S = fresh(); S.rev = -1; alerted = {}; }
+    confirming = null;
+    if (P.mode === 'solo' && keepState) { try { localStorage.removeItem(KEY); } catch(e){} }   // the solo game has moved to the shared one
+    P.mode = null; P.code = code; net.busy = ''; savePrefs();
+    try { sessionStorage.removeItem(KEY + '-left'); } catch(e){}
+    net.subs.push(net.t.watchGame(code, applyGame, subFail));
+    net.subs.push(net.t.watchMarks(code, applyMarks, subFail));
+    net.t.presence(code, P.device, function(list){
+      if (net.code !== code) return;
+      net.peers = list; evalHost(); renderChip(); renderShare();
+    }).then(function(h){
+      if (net.code !== code) { if (h) h.leave(); return; }
+      net.room = h;
+    });
+    render();
+  }
+  // carry = true turns the current solo game into the shared one; false starts a fresh game.
+  function hostGame(carry){
+    if (!net.t || net.cannotWrite) return;
+    net.msg = ''; net.busy = 'Setting up your game…';
+    if (!carry) S = fresh();
+    render();
+    var code = makeCode();
+    net.t.readGame(code).then(function(existing){
+      if (existing) return hostGame(true);                   // code already in use, pick another
+      S.hostId = P.device; S.origHost = P.device; S.rev = (S.rev || 0) + 1;
+      var marks = S.marks.slice();
+      return net.t.writeGame(code, gameDoc())
+        .then(function(){ return Promise.all(marks.map(function(m){ return net.t.writeMark(code, m); })); })
+        .then(function(){ enter(code, true); });
+    }).catch(function(){
+      S.hostId = null; S.origHost = null; net.busy = '';
+      net.msg = 'Couldn’t start a shared game from this view.'; render();
+    });
+  }
+  // auto = rejoining on page load, where a failure goes back to the start screen.
+  function joinGame(code, auto){
+    net.msg = '';
+    if (!auto) { net.busy = 'Looking for game ' + code + '…'; render(); }
+    net.t.readGame(code).then(function(g){
+      net.busy = '';
+      if (!g) {
+        if (auto) toLanding('Game ' + code + ' no longer exists.');
+        else { net.msg = 'No game with that code.'; render(); }
+        return;
+      }
+      enter(code, false); applyGame(g, false);
+    }, function(){
+      net.busy = '';
+      if (auto) toLanding('Couldn’t reach game ' + code + '.');
+      else { net.msg = 'Couldn’t reach that game. Try again.'; render(); }
+    });
+  }
+  // Back to the start screen. A shared game carries on without this device; a solo game stays saved here.
+  function toLanding(msg, leftCode){
+    if (!net.code) saveLocal();
+    teardown(); closePanels(false);
+    net.code = null; net.status = 'solo'; net.readOnly = false; net.busy = '';
+    P.code = null; P.mode = null; savePrefs();
+    try { if (leftCode) sessionStorage.setItem(KEY + '-left', leftCode); } catch(e){}
+    S = fresh(); confirming = null; alerted = {}; net.msg = msg || '';
+    render();
+  }
+  function leaveGame(msg){ toLanding(msg, net.code); }
+  function startSolo(){
+    P.mode = 'solo'; savePrefs();
+    S = loadSolo(); settleExpired();
+    confirming = null; alerted = {}; net.msg = '';
+    render();
+  }
+  function takeClock(){
+    if (!live() || net.readOnly) return;
+    S.hostId = P.device; S.rev = (S.rev || 0) + 1;
+    pushGame(); evalHost(); render();
+  }
+  function connect(){
+    var meta = document.querySelector('meta[name="shenan-ws"]');
+    if (meta && meta.content) {                       // served by our own server: no platform, no sign-in
+      SHARE_URL = location.origin + location.pathname;
+      net.t = wsTransport(P.device); net.ready = true;
+      if (net.code) joinGame(net.code, true); else render();
+      return;
+    }
+    var c = window.claude;
+    var use = function(name){
+      try { return c && typeof c.use === 'function' ? Promise.resolve(c.use(name)).catch(function(){ return null; }) : Promise.resolve(null); }
+      catch(e){ return Promise.resolve(null); }
+    };
+    Promise.all([use('db'), use('room'), use('user')]).then(function(r){
+      if (r[0]) net.t = claudeTransport(r[0], r[1]);
+      var go = function(){
+        net.ready = true;
+        var want = net.code;
+        if (want && net.t) joinGame(want, true);
+        else if (want) toLanding('');
+        else render();
+      };
+      if (r[2] && typeof r[2].can === 'function') {
+        r[2].can('data.write').then(function(v){ if (v === false) net.cannotWrite = true; go(); }, go);
+      } else go();
+    });
+  }
+
+  /* ================= sound ================= */
+  // iPhones mute web-page sound when the ring/silent switch is off. Marking this page as media playback,
+  // and keeping a silent clip looping, makes the alarm play through the switch like a video would.
+  var SILENT = 'data:audio/wav;base64,UklGRsQPAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YaAPAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA', keepAlive = null;
+  function unlockAudio(){
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch(e){}
+    try {
+      if (!keepAlive) { keepAlive = new Audio(SILENT); keepAlive.loop = true; keepAlive.setAttribute('playsinline', ''); }
+      if (keepAlive.paused) { var pr = keepAlive.play(); if (pr && pr.catch) pr.catch(function(){}); }
+    } catch(e){}
+  }
+  function audio(){
+    if (!P.sound) return null;
+    unlockAudio();
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      if (ac.state === 'suspended') ac.resume();
+      return ac;
+    } catch(e){ return null; }
+  }
+  function tone(freq, start, dur, type, gain){
+    var a = audio(); if (!a) return;
+    var o = a.createOscillator(), g = a.createGain(), t = a.currentTime + start;
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(gain, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(a.destination);
+    o.start(t); o.stop(t + dur + 0.05);
+  }
+  function sfx(name){
+    if (name === 'reset') {
+      [523.25,659.25,783.99,1046.5].forEach(function(f,i){ tone(f, i*0.09, 1.6, 'sine', 0.16); });
+      [0,0.5,1,1.5].forEach(function(t){ tone(1318.5, 1.2+t, 0.25, 'triangle', 0.14); tone(1046.5, 1.45+t, 0.25, 'triangle', 0.14); });
+    } else if (name === 'caught') {
+      [[392,0,0.45],[370,0.5,0.45],[349,1,0.45],[311,1.5,1.3]].forEach(function(n){ tone(n[0], n[1], n[2], 'sawtooth', 0.1); });
+    } else if (name === 'won') {
+      [523.25,659.25,783.99,1046.5,1318.5].forEach(function(f,i){ tone(f, i*0.11, i === 4 ? 1.4 : 0.3, 'triangle', 0.16); });
+    } else if (name === 'soon') {
+      tone(880, 0, 0.35, 'sine', 0.12); tone(1174.7, 0.16, 0.5, 'sine', 0.12);
+    } else if (name === 'tick') {
+      tone(1000, 0, 0.07, 'square', 0.05);
+    }
+  }
+
+  /* ================= clock (GM only) ================= */
+  function wake(){ try { if (navigator.wakeLock) navigator.wakeLock.request('screen').catch(function(){}); } catch(e){} }
+  function startClock(){
+    if (!canControl()) return;
+    audio(); wake();
+    S.phase = 'running';
+    S.deadline = nowMs() + S.remaining / S.speed;
+    confirming = null; commit(); render();
+  }
+  function pauseClock(){
+    if (!canControl()) return;
+    S.remaining = remainingMs(); S.phase = 'paused'; S.deadline = null; commit(); render();
+  }
+  function endLoop(){
+    if (!canControl()) return;
+    confirming = null; alerted = {};
+    if (S.loop < 3) {
+      flash(); sfx('reset');
+      S.loop += 1; S.phase = 'ready'; S.remaining = HOUR * 1000; S.deadline = null;
+    } else {
+      S.phase = 'caught'; S.remaining = 0; S.deadline = null; sfx('caught');
+    }
+    commit(); render();
+  }
+  function gotOut(){
+    if (!canControl()) return;
+    S.remaining = remainingMs(); S.won = Math.ceil(S.remaining / 1000);
+    S.phase = 'won'; S.deadline = null; confirming = null; sfx('won'); commit(); render();
+  }
+  function newGame(){
+    if (!canControl()) return;
+    var old = S.marks.slice();
+    S = Object.assign(fresh(), {speed:S.speed, bg:S.bg, hostId:S.hostId, origHost:S.origHost, rev:S.rev});
+    confirming = null; alerted = {};
+    if (net.code) old.forEach(function(m){ removeMarkQuiet(m.id); });
+    commit(); render();
+  }
+  function removeMarkQuiet(id){
+    var code = net.code; gone[id] = Date.now(); delete dirty[id];
+    markChain[id] = (markChain[id] || Promise.resolve()).then(function(){ return net.t.deleteMark(code, id); }).catch(function(){});
+  }
+  function flash(){ var f = $('flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go'); }
+
+  function fit(el){ el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
+  // The mark is only created when the editor is saved; closing it any other way discards it.
+  function addMark(){
+    if (!canWrite()) return;
+    openMark({id:rid(), t:secs(), loop:S.loop, note:''}, true);
+  }
+  var editing = null, mkReturn = null;
+  function openMark(m, isNew){
+    if (!canWrite()) return;
+    closePanels(false);
+    editing = {id:m.id, isNew:isNew};
+    mkReturn = document.activeElement;
+    $('mk-title').textContent = isNew ? 'New timestamp' : 'Edit timestamp';
+    $('mk-t').value = m.t == null ? '' : fmt(m.t);
+    var opts = m.loop === 0 ? '<option value="0">Example</option>' : '';
+    for (var q = 1; q <= S.loop; q++) opts += '<option value="' + q + '">Loop ' + q + '</option>';
+    $('mk-loop').innerHTML = opts; $('mk-loop').value = String(m.loop);
+    $('mk-note').value = m.note || '';
+    $('mk-err').hidden = true; $('mk-del').hidden = isNew;
+    $('panel-mark').hidden = false; $('scrim').hidden = false;
+    (isNew && m.t != null ? $('mk-note') : $('mk-t')).focus();
+  }
+
+  function upcoming(s){
+    var best = null;
+    S.marks.forEach(function(m){
+      if (m.loop >= S.loop) return;
+      var d = s - m.t;
+      if (d > 120 || d < -8) return;
+      if (!best || Math.abs(d) < Math.abs(best.d)) best = {m:m, d:d};
+    });
+    if (!best) return null;
+    var src = best.m.loop ? 'from loop ' + best.m.loop : 'example';
+    var what = fmt(best.m.t) + ': ' + (best.m.note || 'unlabelled timestamp');
+    return {id:best.m.id, key:'soon:' + best.m.id + ':' + S.loop, k:(best.d > 0 ? 'Coming up in ' + fmt(best.d) : 'Right now') + ' · ' + src, v:what};
+  }
+  function captionFor(s){
+    if (confirming === 'skip' && canControl()) return {fixed:true, k:'Skip to reset', v:'Skip the rest of loop ' + S.loop + ' and reset?',
+      acts:'<button class="cap-btn" data-act="skip-yes">Reset the loop</button><button class="cap-btn ghost" data-act="cancel">Keep going</button>'};
+    if (confirming === 'new' && canControl()) return {fixed:true, k:'New game', v:'Start over? This clears the loop count and every timestamp' + (net.code ? ' for everyone' : '') + '.',
+      acts:'<button class="cap-btn" data-act="new-yes">New game</button><button class="cap-btn ghost" data-act="cancel">Cancel</button>'};
+    if (net.code && net.status === 'connecting') return {fixed:true, k:'Game ' + net.code, v:'Connecting…'};
+    if (net.code && net.status === 'error') return {fixed:true, k:'Game ' + net.code, v:'The connection dropped. Tap the game code to reconnect.'};
+    if (S.phase === 'caught') return {k:'Caught', v:'The third timer went off before you got out.'};
+    if (S.phase === 'won') return {k:'Heist pulled off', v:'You got out with ' + fmt(S.won) + ' on the clock.'};
+    if (!canControl()) {
+      if (takeoverOffered()) {
+        var state = S.phase === 'paused' ? 'The clock is paused.'
+          : S.phase === 'ready' ? 'Loop ' + S.loop + ' hasn’t started yet.'
+          : s <= 0 ? 'Time’s up, but the loop hasn’t reset.'
+          : 'The clock is still running.';
+        return {fixed:true, k:'GM not connected', v:state + ' Any player can take it over.', acts:'<button class="cap-btn" data-act="take">Take over the clock</button>'};
+      }
+      if (S.phase === 'ready') return {k:'Loop ' + S.loop, v:'Waiting for the GM to start the clock.'};
+      if (S.phase === 'paused') return {k:'Paused', v:'The GM has stopped the clock.'};
+      if (S.phase === 'running' && s <= 0) return {k:'Time’s up', v:'Waiting for the GM’s device to reset the loop.'};
+    } else if (S.phase === 'paused') {
+      return {k:'Paused', v:'The clock is stopped. The rulebook asks you not to pause mid-loop.'};
+    }
+    if (S.phase === 'running') { var up = upcoming(s); if (up) return up; }
+    return null;
+  }
+
+  // A dismissed toast stays hidden only while its state lasts: once something else shows (or nothing), it can come back.
+  var dismissed = null;
+  function toastFor(s){
+    var c = captionFor(s);
+    if (!c) { dismissed = null; return null; }
+    c.key = c.key || c.k;
+    if (dismissed && dismissed !== c.key) dismissed = null;
+    return dismissed === c.key ? null : c;
+  }
+
+  /* ================= per-tick paint ================= */
+  function paint(){
+    var ms = remainingMs(), s = Math.ceil(ms / 1000), txt = fmt(s);
+    var on = S.phase === 'running' || S.phase === 'paused';
+    if (txt !== last.txt) {
+      var d = $('digits').children, chars = txt.replace(':','');
+      d[0].textContent = chars[0]; d[1].textContent = chars[1]; d[3].textContent = chars[2]; d[4].textContent = chars[3];
+      $('readout').setAttribute('aria-label', txt + ' on the clock, loop ' + S.loop + ' of 3');
+      var now = $('now');
+      if (now) { now.hidden = !on; now.style.order = HOUR - s; $('now-t').textContent = txt; }
+      var rows = $('marks').querySelectorAll('.mark');
+      for (var i = 0; i < rows.length; i++) {
+        var t = +rows[i].dataset.t, lp = +rows[i].dataset.loop;
+        rows[i].classList.toggle('passed', on && t > s);
+        rows[i].classList.toggle('soon', S.phase === 'running' && lp < S.loop && s - t > 0 && s - t <= 120);
+      }
+      if (S.phase === 'running' && S.speed === 1 && s <= 10 && s > 0 && last.txt) sfx('tick');
+      last.txt = txt;
+      if (takeoverOffered() !== last.offer) { render(); return; }
+    }
+    var f = ms / (HOUR * 1000);
+    $('arc').style.strokeDasharray = (f * C) + ' ' + C;
+    $('arc').style.strokeDashoffset = -(1 - f) * C;
+    $('pointer').setAttribute('transform', 'rotate(' + ((1 - f) * 360) + ')');
+    $('dial').dataset.heat = !on ? '' : s <= 60 ? 'hot' : s <= 300 ? 'warm' : '';
+
+    var cap = toastFor(s) || {k:'', v:''};
+    last.capKey = cap.key;
+    if (!!(cap.k && !cap.fixed) !== last.canX) { $('toast-x').hidden = !(cap.k && !cap.fixed); last.canX = !!(cap.k && !cap.fixed); }
+    if (cap.k !== last.capK) { $('cap-k').textContent = cap.k; last.capK = cap.k; $('caption').hidden = !cap.k; }
+    if (cap.v !== last.capV) { $('cap-v').textContent = cap.v; last.capV = cap.v; }
+    var acts = cap.acts || '';
+    if (acts !== last.capActs) { $('cap-acts').innerHTML = acts; last.capActs = acts; }
+    if (!!cap.k !== last.toast) { document.body.classList.toggle('has-toast', !!cap.k); last.toast = !!cap.k; }
+    if (cap.id !== undefined && !alerted[cap.id]) { alerted[cap.id] = true; sfx('soon'); }
+  }
+  function tick(){
+    if (!inGame()) return;
+    if (S.phase === 'running' && remainingMs() <= 0 && canControl()) { endLoop(); return; }
+    paint();
+  }
+
+  /* ================= structural render ================= */
+  // Redraws everything, then puts the cursor back if someone was typing.
+  function render(){
+    var ae = document.activeElement;
+    var keep = ae && ae.id && /^(note-|time-|join-code$)/.test(ae.id)
+      ? {id:ae.id, v:ae.value, a:ae.selectionStart, b:ae.selectionEnd} : null;
+    draw();
+    if (keep) {
+      var el = $(keep.id);
+      if (el && !el.readOnly && !el.disabled) {
+        if (el.tagName !== 'SELECT') el.value = keep.v;
+        el.focus();
+        try { el.setSelectionRange(keep.a, keep.b); } catch(e){}
+        if (el.classList.contains('mark-note')) fit(el);
+      }
+    }
+  }
+  function draw(){
+    var inG = inGame();
+    $('landing').hidden = inG; $('sheet').hidden = !inG; $('titleblock').hidden = !inG; $('dock').hidden = !inG;
+    if (!inG) { renderLanding(); renderBg(); renderChip(); return; }
+    var gm = canControl(), w = canWrite();
+    $('dial').dataset.phase = S.phase;
+    $('loop-label').textContent = S.loop === 3 ? 'Loop 3 · final' : 'Loop ' + S.loop + ' of 3';
+
+    var stamp = $('stamp');
+    stamp.hidden = !(S.phase === 'caught' || S.phase === 'won');
+    stamp.textContent = S.phase === 'won' ? 'Got out' : 'Caught';
+    stamp.classList.toggle('win', S.phase === 'won');
+
+    var a = '';
+    if (!gm) {
+      // Player view: no clock controls.
+      if (S.phase === 'running' && w) a = '<button class="btn primary" data-act="mark">Mark timestamp</button>';
+      if (takeoverOffered()) { /* offered inside the caption */ }
+      else if (live() && !net.readOnly && S.origHost === P.device) a += '<button class="btn quiet" data-act="take">Take the clock back</button>';
+    } else if (S.phase === 'ready') {
+      a = '<button class="btn primary" data-act="start">Start loop ' + S.loop + '</button>';
+    } else if (S.phase === 'running' || S.phase === 'paused') {
+      a = S.phase === 'running'
+        ? '<button class="btn primary" data-act="mark">Mark timestamp</button>'
+        : '<button class="btn primary" data-act="start">Resume</button>';
+      a += S.loop < 3 ? '<button class="btn" data-act="skip">Skip to reset</button>' : '<button class="btn" data-act="out">We got out</button>';
+      if (S.phase === 'running') a += '<button class="btn quiet" data-act="pause">Pause</button>';
+    } else {
+      a = '<button class="btn primary" data-act="new-yes">New game</button>';
+      if (S.phase === 'won' && S.remaining > 0) a += '<button class="btn quiet" data-act="undo">Not yet, keep the clock running</button>';
+    }
+    $('actions').innerHTML = a;
+
+    for (var n = 1; n <= 3; n++) {
+      var cell = $('tb-' + n), v = '—', on = n === S.loop;
+      if (n < S.loop) v = 'Reset';
+      else if (on) v = {ready:'Ready', running:'Running', paused:'Paused', caught:'Caught', won:'Got out'}[S.phase];
+      cell.classList.toggle('on', on);
+      cell.querySelector('.tb-v').textContent = v;
+    }
+    $('tb-sheet').textContent = S.loop + ' of 3';
+
+    var sorted = S.marks.slice().sort(function(x, y){ return y.t - x.t; });
+    $('marks').innerHTML = '<li class="now" id="now" hidden><span>Now <span id="now-t"></span></span></li>' + sorted.map(function(m){
+      var t = fmt(m.t);
+      return '<li class="mark" data-id="' + m.id + '" data-t="' + m.t + '" data-loop="' + m.loop + '" style="order:' + (HOUR - m.t) + '">' +
+        '<button class="mark-open" type="button" data-edit="' + m.id + '"' + (w ? ' aria-label="Edit the ' + t + ' timestamp"' : ' disabled') + '>' +
+        '<span class="mark-t">' + t + '</span>' +
+        '<span class="mark-note' + (m.note ? '' : ' blank') + '">' + esc(m.note || 'No note') + '</span>' +
+        '<span class="mark-loop">' + (m.loop ? 'L' + m.loop : 'Example') + '</span></button></li>';
+    }).join('');
+    $('empty').hidden = S.marks.length > 0;
+    $('add').hidden = !w;
+    $('mark-count').textContent = S.marks.length ? S.marks.length + ' marked' : '';
+
+    $('dialmarks').innerHTML = S.marks.map(function(m){
+      var ang = (HOUR - m.t) / HOUR * 360;
+      return '<path class="dialmark' + (m.loop < S.loop ? ' old' : '') + '" transform="rotate(' + ang + ')" d="M0-183L6-176L0-169L-6-176Z"><title>' + esc(fmt(m.t) + ' ' + m.note) + '</title></path>';
+    }).join('');
+
+    $('btn-sound').textContent = P.sound ? 'Sound on' : 'Sound off';
+    $('btn-sound').setAttribute('aria-pressed', String(P.sound));
+
+    $('bg-strength').value = P.strength;
+    renderBg(); renderChip(); renderShare();
+    last = {offer: takeoverOffered()};
+    paint();
+  }
+
+  function peerCount(){ var seen = {}; (net.peers || []).forEach(function(d){ seen[d] = 1; }); return Object.keys(seen).length; }
+  function renderChip(){
+    var chip = $('chip');
+    chip.hidden = !net.code;
+    $('btn-share').textContent = net.code ? 'Game ' + net.code : 'Game';
+    if (!net.code) return;
+    var role = net.status === 'connecting' ? 'connecting' : net.status === 'error' ? 'offline'
+      : net.readOnly ? 'watching' : canControl() ? 'GM' : 'player';
+    chip.textContent = 'Game ' + net.code + ' · ' + role + (net.peers ? ' · ' + peerCount() + ' here' : '') + (net.warn ? ' · not saved' : '');
+  }
+  // New game (for whoever runs the clock), leaving, and, with ?test, the clock speed.
+  function gameActions(control, leaveLabel){
+    var h = '<div class="row game-acts">';
+    if (control) h += '<button class="btn small" data-share="new">New game</button>';
+    h += '<button class="btn small" data-share="leave">' + leaveLabel + '</button></div>';
+    if (TEST && control) h += '<div class="row"><label for="speed">Clock speed</label><select id="speed" data-share-speed>' +
+      [[1, 'Real time'], [10, '10× faster'], [60, '60× faster']].map(function(o){
+        return '<option value="' + o[0] + '"' + (S.speed === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
+      }).join('') + '</select><span class="hint">Test mode</span></div>';
+    return h;
+  }
+  function renderShare(){
+    var h = '';
+    if (!net.code) {
+      if (!net.ready) h = '<p class="hint">Checking whether shared games work in this view…</p>';
+      else if (!net.t) h = '<p class="hint">Shared games aren’t available in this view. Open the timer from its Claude link while signed in.</p>';
+      else if (net.cannotWrite) h = '<p class="hint">This view can watch a shared game but can’t host one.</p>';
+      else h = '<p class="hint">Turn this solo game into a shared one. The clock and timestamps carry over, you become the GM, and your crew joins with a code.</p>' +
+        '<div class="row"><button class="btn" data-share="host"' + (net.busy ? ' disabled' : '') + '>Host this game</button>' +
+        (net.busy ? '<span class="hint">' + esc(net.busy) + '</span>' : '') + '</div>';
+    }
+    if (!net.code) h += gameActions(true, 'Back to start');
+    else {
+      var gm = canControl(), n = peerCount();
+      var role = net.status === 'connecting' ? 'Connecting…'
+        : net.status === 'error' ? 'The connection to this game dropped.'
+        : net.readOnly ? 'You’re watching. This view can’t change the game.'
+        : gm ? 'You’re the GM. You control the clock and the backdrop.'
+        : 'You’re a player. You can add and edit timestamps.';
+      var who = !net.peers ? 'This view can’t see who else is connected.'
+        : n + (n === 1 ? ' device' : ' devices') + ' connected' + (hostHere() ? (gm ? ', including this one.' : ', including the GM.') : '. The GM’s device isn’t one of them.');
+      h = '<div class="code-row"><div><span class="tb-k">Game code</span><div class="code">' + net.code + '</div></div><p class="hint">' + role + '<br>' + who + '</p></div>' +
+        '<div class="row"><span class="lbl" id="link-k">Join link</span><button class="linkbtn" id="share-link" data-share="copy" aria-describedby="link-k copy-note">' + SHARE_URL + '#' + net.code + '</button><span class="hint" id="copy-note" role="status">Click the link to copy it</span></div><div class="row">';
+      if (net.status === 'error') h += '<button class="btn small" data-share="retry">Reconnect</button>';
+      if (live() && !net.readOnly && !gm) {
+        if (takeoverOffered() || !net.peers) h += '<button class="btn small" data-share="take">Take over the clock</button>';
+        else if (S.origHost === P.device) h += '<button class="btn small" data-share="take">Take the clock back</button>';
+      }
+      h += '</div>' + gameActions(canControl(), 'Leave game');
+    }
+    if (net.msg) h += '<p class="add-err" role="alert">' + esc(net.msg) + '</p>';
+    if (h !== cache.share) $('share-body').innerHTML = h;
+    cache.share = h;
+  }
+
+  function renderLanding(){
+    var off = !!net.busy || !net.t, hostOff = off || net.cannotWrite;
+    var note = net.busy ? net.busy
+      : !net.ready ? 'Checking whether shared games work in this view…'
+      : !net.t ? 'Shared games aren’t available in this view. Open the timer from its Claude link while signed in, or play on one device.' : '';
+    var h = '<div class="choices">' +
+      '<section class="choice"><h3>For the GM</h3><p>' + (net.t && net.cannotWrite ? 'This view can watch a game but can’t host one.' : 'Run the clock and get a code for your crew.') + '</p>' +
+        '<button class="btn primary" data-land="host"' + (hostOff ? ' disabled' : '') + '>Host a game</button></section>' +
+      '<section class="choice"><h3>For players</h3><p>Enter the code from your GM.</p>' +
+        '<form id="join" novalidate><label class="sr" for="join-code">Game code</label>' +
+        '<input id="join-code" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD"' + (net.busy ? ' disabled' : '') + '>' +
+        '<button class="btn" type="submit"' + (off ? ' disabled' : '') + '>Join</button></form></section></div>';
+    if (note) h += '<p class="sub" role="status">' + esc(note) + '</p>';
+    if (net.msg) h += '<p class="add-err" role="alert">' + esc(net.msg) + '</p>';
+    h += '<div class="solo-row"><span>One device for the whole table?</span><button class="btn small" data-land="solo"' + (net.busy ? ' disabled' : '') + '>' +
+      (hasSoloSave() ? 'Continue solo game' : 'Play without sharing') + '</button></div>';
+    if (h !== cache.landing) $('landing-body').innerHTML = h;
+    cache.landing = h;
+  }
+
+  /* ================= backdrops ================= */
+  function renderBg(){
+    var gm = canControl(), list = BGS.slice();
+    var mine = gm && P.useCustom && !!custom;
+    if (custom && gm) list.push({id:'custom', name:'Your image', src:custom, thumb:custom});
+    var curId = mine ? 'custom' : S.bg;
+    var html = list.map(function(b){
+      return '<button class="thumb" data-bg="' + b.id + '" aria-pressed="' + (b.id === curId) + '"' + (gm ? '' : ' disabled') + '><i' + (b.thumb ? ' style="background-image:url(&quot;' + b.thumb + '&quot;)"' : '') + '></i><span>' + esc(b.name) + '</span></button>';
+    }).join('');
+    if (html !== cache.thumbs) $('thumbs').innerHTML = html;
+    cache.thumbs = html;
+    $('thumbs').classList.toggle('locked', !gm);
+    $('bg-upload').hidden = !gm;
+    $('bg-hint').textContent = !gm ? 'The GM picks the backdrop in a shared game. Strength is yours to set.'
+      : 'Your image is redrawn in blueprint blue. Light lines on black work best. Black ink on white is flipped automatically.' +
+        (net.code ? ' In a shared game it shows on this device only.' : '');
+    var cur = list.filter(function(b){ return b.id === curId; })[0];
+    $('bg').style.backgroundImage = cur && cur.src ? 'url("' + cur.src + '")' : 'none';
+    document.documentElement.style.setProperty('--bg-strength', Math.max(12, P.strength) / 100);
+  }
+  // Same treatment the built-in art gets: brightness becomes blueprint-blue line on navy.
+  function blueprint(img){
+    var k = Math.min(1, 1800 / Math.max(img.naturalWidth, img.naturalHeight));
+    var w = Math.max(1, Math.round(img.naturalWidth * k)), h = Math.max(1, Math.round(img.naturalHeight * k));
+    var c = document.createElement('canvas'); c.width = w; c.height = h;
+    var x = c.getContext('2d'); x.drawImage(img, 0, 0, w, h);
+    var d = x.getImageData(0, 0, w, h), p = d.data, sum = 0, i;
+    for (i = 0; i < p.length; i += 4) sum += Math.max(p[i], p[i+1], p[i+2]);
+    var invert = sum / (p.length / 4) / 255 > 0.5;
+    for (i = 0; i < p.length; i += 4) {
+      var a = Math.max(p[i], p[i+1], p[i+2]) / 255;
+      if (invert) a = 1 - a;
+      a = Math.pow(a, 0.85);
+      p[i] = 10 + a * 156; p[i+1] = 48 + a * 151; p[i+2] = 87 + a * 155; p[i+3] = 255;
+    }
+    x.putImageData(d, 0, 0);
+    return c.toDataURL('image/jpeg', 0.8);
+  }
+  $('bg-file').addEventListener('change', function(e){
+    var file = e.target.files && e.target.files[0]; if (!file || !canControl()) return;
+    var r = new FileReader();
+    r.onload = function(){
+      var img = new Image();
+      img.onload = function(){
+        try { custom = blueprint(img); } catch(err){ custom = r.result; }
+        try { localStorage.setItem(KEY + '-bg', custom); } catch(err){}
+        P.useCustom = true; savePrefs(); renderBg();
+      };
+      img.src = r.result;
+    };
+    r.readAsDataURL(file);
+  });
+
+  /* ================= events ================= */
+  function onAct(e){
+    var b = e.target.closest('[data-act]'); if (!b) return;
+    var act = b.dataset.act;
+    if (act === 'start') startClock();
+    else if (act === 'mark') addMark();
+    else if (act === 'pause') pauseClock();
+    else if (act === 'skip') { confirming = 'skip'; render(); }
+    else if (act === 'skip-yes') endLoop();
+    else if (act === 'out') gotOut();
+    else if (act === 'undo') { S.won = null; startClock(); }
+    else if (act === 'new-yes') newGame();
+    else if (act === 'cancel') { confirming = null; render(); }
+    else if (act === 'take') takeClock();
+  }
+  $('actions').addEventListener('click', onAct);
+  $('caption').addEventListener('click', onAct);
+  $('toast-x').addEventListener('click', function(){ dismissed = last.capKey || null; paint(); });
+  $('marks').addEventListener('click', function(e){
+    var b = e.target.closest('[data-edit]'); if (!b || !canWrite()) return;
+    var m = findMark(b.dataset.edit); if (m) openMark(m, false);
+  });
+  $('btn-add').addEventListener('click', function(){
+    // Between loops, a hand-entered mark most likely belongs to the loop that just ended.
+    openMark({id:rid(), t:null, loop:S.phase === 'ready' && S.loop > 1 ? S.loop - 1 : S.loop, note:''}, true);
+  });
+  $('mk-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    if (!editing || !canWrite()) return;
+    var t = parseClock($('mk-t').value);
+    if (t < 0) { $('mk-err').hidden = false; $('mk-t').focus(); return; }
+    var lp = clampInt($('mk-loop').value, 0, S.loop, S.loop);
+    var note = $('mk-note').value.replace(/\n/g, ' ').trim().slice(0, 120);
+    var m = findMark(editing.id);
+    if (!m) { m = {id:editing.id}; S.marks.push(m); }
+    m.t = t; m.loop = lp; m.note = note;
+    closePanels(true); render(); saveMark(m, true);
+  });
+  $('mk-note').addEventListener('keydown', function(e){
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('mk-form').querySelector('[type=submit]').click(); }
+  });
+  $('mk-del').addEventListener('click', function(){
+    if (!editing) return;
+    var id = editing.id; closePanels(true); removeMark(id);
+  });
+  $('thumbs').addEventListener('click', function(e){
+    var b = e.target.closest('[data-bg]'); if (!b || !canControl()) return;
+    if (b.dataset.bg === 'custom') { P.useCustom = true; savePrefs(); }
+    else { P.useCustom = false; savePrefs(); if (S.bg !== b.dataset.bg) { S.bg = b.dataset.bg; commit(); } }
+    renderBg();
+  });
+  $('bg-strength').addEventListener('input', function(e){
+    P.strength = +e.target.value; document.documentElement.style.setProperty('--bg-strength', Math.max(12, P.strength) / 100); savePrefs();
+  });
+
+  var PANELS = [['btn-share','panel-share'], ['btn-bg','panel-bg']];
+  function togglePanel(panel){
+    var open = $(panel).hidden;
+    PANELS.forEach(function(x){
+      var on = open && x[1] === panel;
+      $(x[1]).hidden = !on; $(x[0]).setAttribute('aria-expanded', String(on));
+    });
+    $('scrim').hidden = !open;
+    if (open) $(panel).querySelector('[data-close]').focus();
+  }
+  function closePanels(refocus){
+    $('scrim').hidden = true;
+    if (!$('panel-mark').hidden) {
+      $('panel-mark').hidden = true; editing = null;
+      if (refocus && mkReturn && document.contains(mkReturn)) { try { mkReturn.focus(); } catch(e){} }
+    }
+    PANELS.forEach(function(x){
+      if (!$(x[1]).hidden && refocus) $(x[0]).focus();
+      $(x[1]).hidden = true; $(x[0]).setAttribute('aria-expanded', 'false');
+    });
+  }
+  // Capture phase: decide before a panel re-renders and detaches the clicked element.
+  document.addEventListener('click', function(e){
+    if (e.target.closest('[data-close]')) { closePanels(true); return; }
+    if (!e.target.closest('.panel') && !e.target.closest('.tools') && !e.target.closest('#chip') && !e.target.closest('label[for="bg-file"]')) closePanels(false);
+  }, true);
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closePanels(true); });
+  // iPhones can still drag the page through the dimmed layer, so stop that drag outright.
+  $('scrim').addEventListener('touchmove', function(e){ e.preventDefault(); }, {passive:false});
+  PANELS.forEach(function(x){ $(x[0]).addEventListener('click', function(){ togglePanel(x[1]); }); });
+  $('chip').addEventListener('click', function(){ if ($('panel-share').hidden) togglePanel('panel-share'); });
+
+  $('share-body').addEventListener('change', function(e){
+    if (!e.target.matches('[data-share-speed]')) return;
+    if (!canControl()) { e.target.value = String(S.speed); return; }
+    var rem = remainingMs(); S.speed = +e.target.value || 1;
+    if (S.phase === 'running') S.deadline = nowMs() + rem / S.speed;
+    commit();
+  });
+  $('share-body').addEventListener('click', function(e){
+    var b = e.target.closest('[data-share]'); if (!b) return;
+    var act = b.dataset.share;
+    if (act === 'host') hostGame(true);
+    else if (act === 'leave') leaveGame('');
+    else if (act === 'take') takeClock();
+    else if (act === 'new') { if (!canControl()) return; confirming = 'new'; closePanels(false); render(); }
+    else if (act === 'retry') { if (net.code) joinGame(net.code, false); }
+    else if (act === 'copy') {
+      var url = SHARE_URL + '#' + net.code, note = $('copy-note');
+      var done = function(){ note.textContent = 'Copied'; };
+      // If this view refuses clipboard access, swap in selectable text so the link can still be copied by hand.
+      var manual = function(){
+        var input = document.createElement('input');
+        input.id = 'share-link'; input.readOnly = true; input.value = url;
+        b.replaceWith(input); input.focus(); input.select();
+        note.textContent = 'Couldn’t copy from this view. Copy the selected link.';
+      };
+      try { navigator.clipboard.writeText(url).then(done, manual); } catch(err){ manual(); }
+    }
+  });
+  $('landing').addEventListener('click', function(e){
+    var b = e.target.closest('[data-land]'); if (!b || b.disabled) return;
+    if (b.dataset.land === 'host') hostGame(false);
+    else if (b.dataset.land === 'solo') startSolo();
+  });
+  $('landing').addEventListener('submit', function(e){
+    e.preventDefault();
+    var code = ($('join-code').value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (!/^[A-Z0-9]{4}$/.test(code)) { net.msg = 'A game code is four letters or numbers.'; render(); return; }
+    if (net.t) joinGame(code, false);
+  });
+
+  $('btn-sound').addEventListener('click', function(){ P.sound = !P.sound; if (P.sound) { audio(); sfx('soon'); } else if (keepAlive) keepAlive.pause(); savePrefs(); render(); });
+  $('btn-full').addEventListener('click', function(){
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen().catch(function(){});
+    } catch(e){}
+  });
+  if (!document.documentElement.requestFullscreen) $('btn-full').hidden = true;
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden && S.phase === 'running') { wake(); tick(); } });
+  // Browsers only allow sound after a tap, so a player's first tap anywhere unlocks the alarm.
+  document.addEventListener('pointerdown', function(){ audio(); }, {once:true});
+
+  /* ================= boot ================= */
+  function boot(data){
+    P = loadPrefs();
+    try { custom = localStorage.getItem(KEY + '-bg'); } catch(e){}
+    var want = hashCode() || (typeof P.code === 'string' && /^[A-Z0-9]{4}$/.test(P.code) ? P.code : null);
+    if (want) {
+      // Rejoining a shared game: show an empty clock until it answers.
+      S = fresh(); S.rev = -1; net.code = want; net.status = 'connecting';
+    } else if (P.mode === 'solo' || (data && data.loop)) {
+      P.mode = 'solo';
+      S = data && data.loop ? normalize(data) : loadSolo();
+      settleExpired();
+    } else {
+      S = fresh();   // start screen
+    }
+    var ticks = '';
+    for (var i = 0; i < 60; i++) {
+      var major = i % 5 === 0;
+      ticks += '<line class="tick' + (major ? ' major' : '') + '" y1="-176" y2="' + (major ? -163 : -169) + '" transform="rotate(' + (i * 6) + ')"/>';
+      if (major) {
+        var r = i * 6 * Math.PI / 180;
+        ticks += '<text class="ticklabel" x="' + (150 * Math.sin(r)).toFixed(1) + '" y="' + (-150 * Math.cos(r)).toFixed(1) + '">' + (60 - i) + '</text>';
+      }
+    }
+    $('ticks').innerHTML = ticks;
+    render();
+    setInterval(tick, 100);
+    connect();
+  }
+  var hot = window.claude && window.claude.hot;
+  try { if (hot && hot.snapshot) hot.snapshot(function(){ return !P || net.code || P.mode !== 'solo' ? null : S; }); } catch(e){}
+  if (hot && hot.ready) hot.ready(boot); else boot(hot && hot.data);
+})();
+</script>

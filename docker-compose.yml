@@ -1,0 +1,28 @@
+services:
+  timer:
+    build: .
+    restart: unless-stopped
+    environment:
+      MAX_AGE_HOURS: 72        # idle games are deleted after this long
+    volumes:
+      - timer-data:/data
+    expose:
+      - "3000"
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - timer
+volumes:
+  timer-data:
+  caddy-data:
+  caddy-config:
