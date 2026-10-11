@@ -272,13 +272,11 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
 .luck-head span{font:400 12px/1 var(--mono);color:var(--line)}
 .luck-head b{font:400 20px/1 var(--display);color:var(--amber);margin-right:2px}
 .dice{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px;max-width:440px}
-.die{aspect-ratio:1;min-width:0;padding:0;border:1.5px solid var(--amber);border-radius:4px;background:rgba(222,177,72,.12);position:relative;cursor:pointer;transition:transform .08s}
-.die::after{content:"";position:absolute;width:22%;height:22%;border-radius:50%;background:var(--amber);left:39%;top:39%}
-.die[aria-pressed="true"]{background:var(--amber);transform:translateY(-3px);box-shadow:0 3px 0 var(--shadow)}
-.die[aria-pressed="true"]::after{background:var(--navy)}
-.die.off{border-color:var(--line-dim);background:none}
-.die.off::after{background:rgba(166,199,242,.22)}
-.die.off[aria-pressed="true"]{border:1.5px dashed var(--line);background:none;transform:none;box-shadow:none}
+.die{aspect-ratio:1;min-width:0;padding:0;border:1.5px solid var(--amber);border-radius:4px;background:rgba(222,177,72,.12);color:var(--amber);cursor:pointer;transition:transform .08s;display:block}
+.die svg{display:block;width:100%;height:100%}
+.die[aria-pressed="true"]{background:var(--amber);color:var(--navy);transform:translateY(-3px);box-shadow:0 3px 0 var(--shadow)}
+.die.off{border-color:var(--line-dim);background:none;color:rgba(166,199,242,.28)}
+.die.off[aria-pressed="true"]{border:1.5px dashed var(--line);background:none;color:var(--line);transform:none;box-shadow:none}
 .die:disabled{cursor:default}
 .luck-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .luck-bar .hint{font-size:12.5px}
@@ -1668,6 +1666,15 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   // Picks stay on this device until spent. pick = available dice chosen to spend;
   // back = spent dice the GM has chosen to give back.
   var LD = {pick:{}, back:{}, ask:false, busy:false};
+  // Each die always shows the same face, just for looks, like a handful of dice already rolled.
+  var DIE_FACES = [3, 5, 1, 6, 2, 4, 4, 2, 6, 1, 5, 3, 2, 6, 3, 5, 1, 4, 6, 2];
+  var PIPS = {1:['5,5'], 2:['3,3','7,7'], 3:['3,3','5,5','7,7'], 4:['3,3','7,3','3,7','7,7'],
+              5:['3,3','7,3','5,5','3,7','7,7'], 6:['3,3','7,3','3,5','7,5','3,7','7,7']};
+  function dieFace(i){
+    return '<svg viewBox="0 0 10 10" aria-hidden="true">' + PIPS[DIE_FACES[i]].map(function(c){
+      var xy = c.split(','); return '<circle cx="' + xy[0] + '" cy="' + xy[1] + '" r=".95" fill="currentColor"/>';
+    }).join('') + '</svg>';
+  }
   function luckOn(){ return inGame() && !!S.luck; }
   function luckClear(){ LD.pick = {}; LD.back = {}; LD.ask = false; }
   function renderLuck(){
@@ -1684,7 +1691,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
       var spent = i >= n, picked = spent ? !!LD.back[i] : !!LD.pick[i];
       var can = spent ? gm : w;
       d += '<button type="button" class="die' + (spent ? ' off' : '') + '" data-die="' + i + '" aria-pressed="' + picked + '"' +
-        (can ? '' : ' disabled') + ' aria-label="Luck die ' + (i + 1) + (spent ? ', spent' : '') + '"></button>';
+        (can ? '' : ' disabled') + ' aria-label="Luck die ' + (i + 1) + (spent ? ', spent' : '') + '">' + dieFace(i) + '</button>';
     }
     var bar;
     if (LD.ask) bar = '<div class="luck-ok" role="alertdialog" aria-label="Spend Luck Dice"><p>Spend ' + k + ' Luck ' + (k === 1 ? 'Die' : 'Dice') + '? ' + (n - k) + ' left this loop.</p>' +
