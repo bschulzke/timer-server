@@ -235,7 +235,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
 @media (prefers-reduced-motion:reduce){.caption{animation:none}}
 .cap-acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:9px}
 .cap-acts:empty{display:none}
-/* A private cue's heads-up: dark like the cue rows, with the same dashed amber edge and "only you" tag. */
+/* A secret cue's heads-up: dark like the cue rows, with the same dashed amber edge and "only you" tag. */
 .caption.cue{background:var(--navy-deep);color:var(--paper);border:1px dashed var(--amber);box-shadow:5px 5px 0 var(--shadow)}
 .caption.cue b{display:flex;align-items:center;gap:10px;color:var(--amber)}
 .caption.cue b::after{content:"Only you";font:700 10px/1 var(--mono);letter-spacing:.1em;border:1px solid rgba(222,177,72,.6);padding:3px 5px}
@@ -266,7 +266,15 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
 .mark .x:hover{color:var(--alarm)}
 .mark.passed{opacity:.45}
 .mark.soon{background:rgba(222,177,72,.16)}
-/* Private GM cues: only on the hosting device, never synced. */
+/* Secret GM cues: only on the hosting device, never synced. */
+#panel-scen{width:min(480px,calc(100% - 32px))}
+.scen-list{display:grid;gap:6px}
+.scen-opt{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 12px;background:none;border:1px solid var(--line-dim);color:var(--paper);font:700 13px/1.2 var(--mono);text-align:left;cursor:pointer;border-radius:0}
+.scen-opt .hint{white-space:nowrap}
+.scen-opt[aria-checked="true"]{border-color:var(--amber);color:var(--amber);background:rgba(222,177,72,.08)}
+.scen-prev{list-style:none;margin:0;padding:0;display:grid}
+.scen-prev li{display:grid;grid-template-columns:3.2em 1fr;gap:12px;align-items:baseline;padding:6px 2px;border-top:1px solid rgba(166,199,242,.15);font:400 14px/1.3 var(--mono);color:var(--paper)}
+.scen-prev .mark-t{font-size:20px;width:auto;border:0;padding:0}
 .mark.cue .mark-open{border-left:1px dashed var(--amber);padding-left:13px}
 .mark.cue .mark-loop{color:var(--amber);border-color:rgba(222,177,72,.55)}
 .cues{display:grid;gap:10px;border-top:1px solid var(--line-dim);padding-top:14px}
@@ -432,6 +440,10 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
           <p class="add-err" id="mk-err" role="alert" hidden>Enter the time on the clock, from 00:00 to 60:00.</p>
           <div class="mk-btns"><button class="btn primary" type="submit">Save</button><button class="btn quiet" type="button" data-close>Cancel</button><button class="btn small mk-del" type="button" id="mk-del">Delete</button></div>
         </form>
+      </section>
+      <section class="panel" id="panel-scen" role="dialog" aria-modal="true" aria-labelledby="sc-title" hidden>
+        <div class="panel-head"><h2 id="sc-title">Load a scenario’s cues</h2><button class="panel-x" data-close aria-label="Close">×</button></div>
+        <div class="mk" id="scen-body"></div>
       </section>
       <section class="panel" id="panel-share" hidden>
         <div class="panel-head"><h2>Game</h2><button class="panel-x" data-close aria-label="Close game panel">×</button></div>
@@ -700,7 +712,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     return t > HOUR ? -1 : t;
   }
 
-  /* ================= private cues =================
+  /* ================= secret cues =================
      The GM's own reminders of planned events. They live only in this browser's storage and are
      never sent to the server, so players can't see them, and neither can anyone who takes over
      the clock. Only the device that hosted the game gets them. */
@@ -728,6 +740,61 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     if (!cueOwner() || !S.gid || CU.gid === S.gid) return;
     if (CU.gid) CU.list = [];
     CU.gid = S.gid; saveCues();
+  }
+  // Timed events from the rulebook's scenarios, as clock readings. Keep in step with build_all.py.
+  var SCENARIOS = [
+    {name:'Clowning Around', cues:[
+      ['49:12', 'Trisha sets fire to the ringmaster’s trailer'],
+      ['40:00', 'Animal show starts in the Big Top'],
+      ['10:00', 'Animal show ends']]},
+    {name:'Yacht-zee', cues:[
+      ['46:35', 'Volkova leaves her suite (rigged to burn if entered)'],
+      ['31:40', 'Volkova attacks Adelson; his USB key is damaged'],
+      ['26:45', 'Glenn enters the gallery with his equipment'],
+      ['23:20', 'Adelson calls the police'],
+      ['20:00', 'Fireworks start'],
+      ['15:00', 'Gallery closes'],
+      ['10:00', 'Fireworks end; guests start leaving'],
+      ['05:40', 'Glenn finishes appraising the Anubis statue'],
+      ['02:35', 'Police arrive']]},
+    {name:'Around the World in Ninety Minutes', cues:[
+      ['56:45', 'Lund starts her spacewalk, carrying the safe key'],
+      ['07:20', 'Lund’s spacewalk ends']]}
+  ];
+  var scenPick = 0;
+  function renderScen(){
+    var sc = SCENARIOS[scenPick], n = CU.list.length, k = sc.cues.length;
+    var h = '<div class="scen-list" role="radiogroup" aria-label="Scenario">' + SCENARIOS.map(function(s, i){
+        return '<button type="button" class="scen-opt" role="radio" aria-checked="' + (i === scenPick) + '" data-scen="' + i + '"><span>' + esc(s.name) + '</span><span class="hint">' + s.cues.length + ' cues</span></button>';
+      }).join('') + '</div>' +
+      '<div class="mk-btns">' +
+      (n ? '<button class="btn primary" type="button" data-scen-go="replace">Replace your ' + n + (n === 1 ? ' cue' : ' cues') + '</button>' +
+           '<button class="btn" type="button" data-scen-go="add">Add to them</button>'
+         : '<button class="btn primary" type="button" data-scen-go="replace">Load ' + k + ' cues</button>') + '</div>' +
+      '<ol class="scen-prev" aria-label="Cues in ' + esc(sc.name) + '">' + sc.cues.map(function(c){
+        return '<li><span class="mark-t">' + c[0] + '</span><span>' + esc(c[1]) + '</span></li>';
+      }).join('') + '</ol>';
+    $('scen-body').innerHTML = h;
+  }
+  function openScen(){
+    if (!cueOwner()) return;
+    closePanels(false);
+    renderScen();
+    $('panel-scen').hidden = false; $('scrim').hidden = false;
+    $('scen-body').querySelector('[aria-checked="true"]').focus();
+  }
+  // Loaded cues are ordinary cues afterwards. Adding skips any the list already has.
+  function loadScen(mode){
+    if (!cueOwner()) return;
+    var list = mode === 'add' ? CU.list.slice() : [];
+    SCENARIOS[scenPick].cues.forEach(function(c){
+      var t = parseClock(c[0]);
+      if (t < 0 || list.length >= 100) return;
+      if (list.some(function(x){ return x.t === t && x.note === c[1]; })) return;
+      list.push({id:rid(), t:t, note:c[1]});
+    });
+    CU.list = list; CU.gid = S.gid; CU.on = true; saveCues();
+    closePanels(false); render();
   }
 
   /* ================= roles ================= */
@@ -1342,7 +1409,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     closePanels(false);
     editing = {id:c.id, isNew:isNew, cue:true};
     mkReturn = document.activeElement;
-    $('mk-title').textContent = isNew ? 'New private cue' : 'Edit private cue';
+    $('mk-title').textContent = isNew ? 'New secret cue' : 'Edit secret cue';
     editorMode(true);
     $('mk-t').value = c.t == null ? '' : fmt(c.t);
     $('mk-note').value = c.note || '';
@@ -1524,7 +1591,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     }).join('') + (cuesShown() ? CU.list : []).map(function(c){
       var t = fmt(c.t);
       return '<li class="mark cue" data-t="' + c.t + '" data-loop="0" style="order:' + (HOUR - c.t) + '">' +
-        '<button class="mark-open" type="button" data-cue-edit="' + c.id + '" aria-label="Edit your private ' + t + ' cue">' +
+        '<button class="mark-open" type="button" data-cue-edit="' + c.id + '" aria-label="Edit your secret ' + t + ' cue">' +
         '<span class="mark-t">' + t + '</span>' +
         '<span class="mark-note' + (c.note ? '' : ' blank') + '">' + esc(c.note || 'No note') + '</span>' +
         '<span class="mark-loop">Only you</span></button></li>';
@@ -1577,9 +1644,9 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     if (!cueOwner()) return '';
     var n = CU.list.length;
     var h = '<div class="cues"><label class="tog" for="cue-on"><input type="checkbox" id="cue-on" data-cue-on' + (CU.on ? ' checked' : '') + '>' +
-      '<span>Private cues<small>Silent reminders of events you’ve planned, two minutes before each one, every loop. Saved on this device only. Players never see them.</small></span></label>' +
-      '<p class="hint warn">If this screen is on the TV, everyone will see your cues. Host from your phone instead, and open the game on the TV with the code.</p>';
-    if (CU.on) h += '<div class="row"><button class="btn small" data-share="cue-add">Add a cue</button><span class="hint">' +
+      '<span>Secret cues<small>Silent reminders of events you’ve planned, two minutes before each one, every loop. Shown on this device only.</small></span></label>' +
+      '<p class="hint warn">Don’t turn these on if players can see this screen.</p>';
+    if (CU.on) h += '<div class="row"><button class="btn small" data-share="cue-add">Add a cue</button><button class="btn small" data-share="cue-scen">Load a scenario</button><span class="hint">' +
       (n ? n + (n === 1 ? ' cue' : ' cues') + ' in your timestamps list' : 'No cues yet') + '</span></div>';
     return h + '</div>';
   }
@@ -1746,6 +1813,12 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     // Browsers without beforeinput (or autofill): tidy whatever landed in the field.
     f.addEventListener('input', function(){ fresh = false; set(clockDigits(f.value)); });
   })();
+  $('scen-body').addEventListener('click', function(e){
+    var b = e.target.closest('[data-scen]');
+    if (b) { scenPick = +b.dataset.scen; renderScen(); var f = $('scen-body').querySelector('[data-scen="' + scenPick + '"]'); if (f) f.focus(); return; }
+    var g = e.target.closest('[data-scen-go]');
+    if (g) loadScen(g.dataset.scenGo);
+  });
   $('mk-form').addEventListener('submit', function(e){
     e.preventDefault();
     if (!editing) return;
@@ -1798,6 +1871,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   }
   function closePanels(refocus){
     $('scrim').hidden = true;
+    $('panel-scen').hidden = true;
     if (!$('panel-mark').hidden) {
       $('panel-mark').hidden = true; editing = null;
       if (refocus && mkReturn && document.contains(mkReturn)) { try { mkReturn.focus(); } catch(e){} }
@@ -1849,6 +1923,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     else if (act === 'new') { if (!canControl()) return; confirming = 'new'; closePanels(false); render(); }
     else if (act === 'retry') { if (net.code) joinGame(net.code, false); }
     else if (act === 'cue-add') openCue({id:rid(), t:null, note:''}, true);
+    else if (act === 'cue-scen') openScen();
     else if (act === 'copy') {
       var url = SHARE_URL + '#' + net.code, note = $('copy-note');
       var done = function(){ note.textContent = 'Copied'; };
