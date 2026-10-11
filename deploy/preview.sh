@@ -5,13 +5,14 @@
 # ghcr.io/bschulzke/timer-server. This script only pulls that exact image (by digest) and runs it,
 # locked down, at <pr>.preview.tinytabletops.com. Nothing from the PR is cloned, built or mounted here.
 #
-# It runs as root through one sudo rule, and is the only thing GitHub's SSH key may run (a forced
-# command for the deploy user). GitHub sends one of:
-#   deploy <pr-number> <commit-sha> <image-digest>   start or update a PR preview
-#   remove <pr-number>                                 delete a PR preview
-#   live <commit-sha> <image-digest>                   update the live site to a commit on main
-#   list
-# Anything else is refused.
+# The same file is installed twice, and what it accepts depends on the name it runs under:
+#   timer-preview   deploy <pr-number> <commit-sha> <image-digest>   start or update a PR preview
+#                   remove <pr-number>                                 delete a PR preview
+#                   list                                               show running previews
+#   timer-live      live <commit-sha> <image-digest>                   update the live site to a commit on main
+# Each runs as root through its own sudo rule, and each is the forced command of its own SSH key: the
+# preview key (usable from any branch's workflow) can never update the live site, and the live key is
+# kept in a GitHub environment that only main can use. Anything else is refused.
 set -eu
 umask 022
 
@@ -30,6 +31,11 @@ ACTION=${1:-}; PR=${2:-}; SHA=${3:-}; DIGEST=${4:-}
 
 fail() { echo "preview: $*" >&2; exit 1; }
 short() { printf '%.7s' "$1"; }
+case "${0##*/}" in
+  timer-live)    [ "$ACTION" = live ] || fail "this key can only update the live site";;
+  timer-preview) [ "$ACTION" != live ] || fail "this key can't update the live site";;
+  *)             fail "install this script as timer-preview or timer-live";;
+esac
 if [ "$ACTION" = live ]; then
   SHA=${2:-}; DIGEST=${3:-}; PR=0
   [ $# -le 3 ] || fail "too many arguments"

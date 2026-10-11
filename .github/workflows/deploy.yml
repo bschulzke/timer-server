@@ -4,6 +4,9 @@
 # ghcr.io/bschulzke/timer-server. The droplet only pulls that exact image by digest, through the
 # locked-down deploy script, and switches the live site to it. Saved games carry over.
 # To roll back, re-run the deploy for an older commit from the Actions tab.
+#
+# The live key (LIVE_SSH_KEY) lives in the "production" environment, which only main may use, so a
+# workflow edited on some other branch can't read it. Its forced command on the droplet accepts only `live`.
 name: Deploy live site
 
 on:
@@ -25,6 +28,7 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: Check out main
         uses: actions/checkout@v4
@@ -56,7 +60,7 @@ jobs:
 
       - name: Update the live site
         env:
-          KEY: ${{ secrets.PREVIEW_SSH_KEY }}
+          KEY: ${{ secrets.LIVE_SSH_KEY }}
           HOST: ${{ secrets.PREVIEW_HOST }}
           KNOWN: ${{ secrets.PREVIEW_KNOWN_HOSTS }}
           SHA: ${{ github.sha }}

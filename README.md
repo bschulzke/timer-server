@@ -60,8 +60,30 @@ Caddy is restarted only when the Caddyfile changed.
 To roll back, open the Actions tab, find the deploy for the commit you want, and re-run it. You can still
 deploy by hand with `git pull && docker compose up -d --build`.
 
+Merge is the only way in. The live update uses its own SSH key (`LIVE_SSH_KEY`), stored in a GitHub
+environment named `production` that only `main` may use, so a workflow edited on any other branch can't read it.
+On the droplet that key's forced command is `timer-live`, which accepts nothing but `live`; the preview key's is
+`timer-preview`, which refuses `live`. With `main` protected (changes only through PRs, merged by you), merging
+is the gate.
+
 The deploy script itself is not updated by deploys: changes to `deploy/preview.sh` take effect only when you
-re-run its `install` line on the droplet, so nothing merged can quietly change what the deploy key may do.
+re-run its `install` lines on the droplet, so nothing merged can quietly change what either key may do.
+
+One-time setup (droplet, as root), after the preview setup below:
+
+    cd ~/timer-server && git pull
+    install -o root -g root -m 755 deploy/preview.sh /usr/local/bin/timer-preview
+    install -o root -g root -m 755 deploy/preview.sh /usr/local/bin/timer-live
+    printf '%s\n' 'Defaults!/usr/local/bin/timer-preview, /usr/local/bin/timer-live env_keep += "SSH_ORIGINAL_COMMAND"' \
+      'deploy ALL=(root) NOPASSWD: /usr/local/bin/timer-preview, /usr/local/bin/timer-live' > /etc/sudoers.d/timer-preview
+    chmod 440 /etc/sudoers.d/timer-preview && visudo -cf /etc/sudoers.d/timer-preview
+    ssh-keygen -t ed25519 -N "" -C github-live -f /root/live-key
+    echo "command=\"sudo -n /usr/local/bin/timer-live\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty $(cat /root/live-key.pub)" >> /home/deploy/.ssh/authorized_keys
+
+On GitHub: Settings → Environments → New environment `production`; under Deployment branches and tags choose
+"Selected branches and tags" and add `main`; add the environment secret `LIVE_SSH_KEY` (contents of
+`/root/live-key`), then `rm /root/live-key /root/live-key.pub`. Protect `main` under Settings → Rules →
+Rulesets (see the PR for the exact settings).
 
 ## PR previews
 Every pull request from a branch in this repo gets its own copy of the app at
@@ -87,10 +109,7 @@ One-time setup (droplet, as root):
     cd ~/timer-server && git pull
     adduser --disabled-password --gecos "" deploy
     mkdir -p /srv/previews/allowed
-    install -o root -g root -m 755 deploy/preview.sh /usr/local/bin/timer-preview
-    printf '%s\n' 'Defaults!/usr/local/bin/timer-preview env_keep += "SSH_ORIGINAL_COMMAND"' \
-      'deploy ALL=(root) NOPASSWD: /usr/local/bin/timer-preview' > /etc/sudoers.d/timer-preview
-    chmod 440 /etc/sudoers.d/timer-preview && visudo -cf /etc/sudoers.d/timer-preview
+    # (install lines and sudoers as in "Automatic deploys" above)
     ssh-keygen -t ed25519 -N "" -C github-preview -f /root/preview-key
     install -d -o deploy -m 700 /home/deploy/.ssh
     echo "command=\"sudo -n /usr/local/bin/timer-preview\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty $(cat /root/preview-key.pub)" > /home/deploy/.ssh/authorized_keys
@@ -102,7 +121,7 @@ Then add repository secrets on GitHub: `PREVIEW_HOST` (the droplet's IP), `PREVI
 Delete `/root/preview-key` from the droplet once the secret is saved. After the first preview build, make the
 `timer-server` package public on GitHub (Packages → timer-server → Package settings → Change visibility), so
 the droplet can pull it. `sudo timer-preview list` shows running previews. If `deploy/preview.sh` changes,
-re-run the `install` line.
+re-run the `install` lines.
 
 ## Settings (environment variables on the `timer` service)
 `MAX_AGE_HOURS` (default 72), `MAX_GAMES` (default 2000), `PORT`, `DATA_FILE`.
