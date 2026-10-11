@@ -260,6 +260,12 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
 .mark .x:hover{color:var(--alarm)}
 .mark.passed{opacity:.45}
 .mark.soon{background:rgba(222,177,72,.16)}
+/* Private GM cues: only on the hosting device, never synced. */
+.mark.cue .mark-open{border-left:3px dashed var(--amber);padding-left:11px}
+.mark.cue .mark-loop{color:var(--amber);border-color:rgba(222,177,72,.55)}
+.cues{display:grid;gap:10px;border-top:1px solid var(--line-dim);padding-top:14px}
+.share .tog input{width:20px;height:20px;padding:0}
+.hint.warn{color:var(--alarm)}
 .now{display:flex;align-items:center;gap:10px;padding:4px 14px;font:700 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--paper)}
 .now::after{content:"";flex:1;border-top:1.5px solid var(--paper)}
 .empty{margin:0;padding:14px;font-size:14px;color:var(--line)}
@@ -416,7 +422,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
             <div class="fld"><label for="mk-t">Clock reading</label><input id="mk-t" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="14:00"></div>
             <div class="fld"><label for="mk-loop">Happened in</label><select id="mk-loop"></select></div>
           </div>
-          <div class="fld"><label for="mk-note">What happened</label><textarea id="mk-note" rows="3" maxlength="120" placeholder="e.g. guard leaves the gate"></textarea></div>
+          <div class="fld"><label for="mk-note" id="mk-note-k">What happened</label><textarea id="mk-note" rows="3" maxlength="120" placeholder="e.g. guard leaves the gate"></textarea></div>
           <p class="add-err" id="mk-err" role="alert" hidden>Enter what the clock read, in minutes and seconds, like 14:00.</p>
           <div class="mk-btns"><button class="btn primary" type="submit">Save</button><button class="btn quiet" type="button" data-close>Cancel</button><button class="btn small mk-del" type="button" id="mk-del">Delete</button></div>
         </form>
@@ -680,6 +686,28 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     var t = m ? (+m[1]) * 60 + (+(m[2] || 0)) : -1;
     return (!m || +(m[2] || 0) > 59 || t > HOUR) ? -1 : t;
   }
+
+  /* ================= private cues =================
+     The GM's own reminders of planned events. They live only in this browser's storage and are
+     never sent to the server, so players can't see them, and neither can anyone who takes over
+     the clock. Only the device that hosted the game gets them. */
+  var CUE_KEY = KEY + '-cues', CU = {on:false, list:[]};
+  function loadCues(){
+    var c = {on:false, list:[]};
+    try {
+      var r = JSON.parse(localStorage.getItem(CUE_KEY) || 'null');
+      if (r) {
+        c.on = !!r.on;
+        if (Array.isArray(r.list)) c.list = r.list.filter(function(x){ return x && typeof x.id === 'string'; }).slice(0, 100)
+          .map(function(x){ return {id:x.id.slice(0, 40), t:clampInt(x.t, 0, HOUR, 0), note:String(x.note || '').slice(0, 120)}; });
+      }
+    } catch(e){}
+    return c;
+  }
+  function saveCues(){ try { localStorage.setItem(CUE_KEY, JSON.stringify(CU)); } catch(e){} }
+  function findCue(id){ return CU.list.filter(function(c){ return c.id === id; })[0]; }
+  function cueOwner(){ return !!net.code && !!S.origHost && S.origHost === P.device; }
+  function cuesShown(){ return cueOwner() && CU.on; }
 
   /* ================= roles ================= */
   // On the start screen until a game is hosted, joined or started solo.
@@ -1272,6 +1300,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     editing = {id:m.id, isNew:isNew};
     mkReturn = document.activeElement;
     $('mk-title').textContent = isNew ? 'New timestamp' : 'Edit timestamp';
+    editorMode(false);
     $('mk-t').value = m.t == null ? '' : fmt(m.t);
     var opts = m.loop === 0 ? '<option value="0">Example</option>' : '';
     for (var q = 1; q <= S.loop; q++) opts += '<option value="' + q + '">Loop ' + q + '</option>';
@@ -1281,19 +1310,41 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     $('panel-mark').hidden = false; $('scrim').hidden = false;
     (isNew && m.t != null ? $('mk-note') : $('mk-t')).focus();
   }
+  // The timestamp editor doubles as the cue editor; cues have no loop.
+  function editorMode(cue){
+    $('mk-loop').closest('.fld').hidden = cue;
+    $('mk-note-k').textContent = cue ? 'What happens' : 'What happened';
+    $('mk-note').placeholder = cue ? 'e.g. the boss leaves his office' : 'e.g. guard leaves the gate';
+  }
+  function openCue(c, isNew){
+    if (!cueOwner()) return;
+    closePanels(false);
+    editing = {id:c.id, isNew:isNew, cue:true};
+    mkReturn = document.activeElement;
+    $('mk-title').textContent = isNew ? 'New private cue' : 'Edit private cue';
+    editorMode(true);
+    $('mk-t').value = c.t == null ? '' : fmt(c.t);
+    $('mk-note').value = c.note || '';
+    $('mk-err').hidden = true; $('mk-del').hidden = isNew;
+    $('panel-mark').hidden = false; $('scrim').hidden = false;
+    $('mk-t').focus();
+  }
 
   function upcoming(s){
     var best = null;
-    S.marks.forEach(function(m){
-      if (m.loop >= S.loop) return;
-      var d = s - m.t;
+    function near(item, d, isCue){
       if (d > 120 || d < -8) return;
-      if (!best || Math.abs(d) < Math.abs(best.d)) best = {m:m, d:d};
-    });
+      if (!best || Math.abs(d) < Math.abs(best.d)) best = {m:item, d:d, cue:isCue};
+    }
+    S.marks.forEach(function(m){ if (m.loop < S.loop) near(m, s - m.t, false); });
+    if (cuesShown()) CU.list.forEach(function(c){ near(c, s - c.t, true); });
     if (!best) return null;
+    var when = best.d > 0 ? 'Coming up in ' + fmt(best.d) : 'Right now';
+    // No id, so no chime: a cue's heads-up is silent.
+    if (best.cue) return {key:'cue:' + best.m.id + ':' + S.loop, k:when + ' · your private cue', v:fmt(best.m.t) + ': ' + (best.m.note || 'unlabelled cue')};
     var src = best.m.loop ? 'from loop ' + best.m.loop : 'example';
     var what = fmt(best.m.t) + ': ' + (best.m.note || 'unlabelled timestamp');
-    return {id:best.m.id, key:'soon:' + best.m.id + ':' + S.loop, k:(best.d > 0 ? 'Coming up in ' + fmt(best.d) : 'Right now') + ' · ' + src, v:what};
+    return {id:best.m.id, key:'soon:' + best.m.id + ':' + S.loop, k:when + ' · ' + src, v:what};
   }
   function captionFor(s){
     if (confirming === 'skip' && canControl()) return {fixed:true, k:'Skip to reset', v:'Skip the rest of loop ' + S.loop + ' and reset?',
@@ -1447,6 +1498,13 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
         '<span class="mark-t">' + t + '</span>' +
         '<span class="mark-note' + (m.note ? '' : ' blank') + '">' + esc(m.note || 'No note') + '</span>' +
         '<span class="mark-loop">' + (m.loop ? 'L' + m.loop : 'Example') + '</span></button></li>';
+    }).join('') + (cuesShown() ? CU.list : []).map(function(c){
+      var t = fmt(c.t);
+      return '<li class="mark cue" data-t="' + c.t + '" data-loop="0" style="order:' + (HOUR - c.t) + '">' +
+        '<button class="mark-open" type="button" data-cue-edit="' + c.id + '" aria-label="Edit your private ' + t + ' cue">' +
+        '<span class="mark-t">' + t + '</span>' +
+        '<span class="mark-note' + (c.note ? '' : ' blank') + '">' + esc(c.note || 'No note') + '</span>' +
+        '<span class="mark-loop">Only you</span></button></li>';
     }).join('');
     $('empty').hidden = S.marks.length > 0;
     $('add').hidden = !w;
@@ -1492,6 +1550,16 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
       }).join('') + '</select><span class="hint">Test mode</span></div>';
     return h;
   }
+  function cueSection(){
+    if (!cueOwner()) return '';
+    var n = CU.list.length;
+    var h = '<div class="cues"><label class="tog" for="cue-on"><input type="checkbox" id="cue-on" data-cue-on' + (CU.on ? ' checked' : '') + '>' +
+      '<span>Private cues<small>Silent reminders of events you’ve planned, two minutes before each one, every loop. Saved on this device only. Players never see them.</small></span></label>' +
+      '<p class="hint warn">If this screen is on the TV, everyone will see your cues. Host from your phone instead, and open the game on the TV with the code.</p>';
+    if (CU.on) h += '<div class="row"><button class="btn small" data-share="cue-add">Add a cue</button><span class="hint">' +
+      (n ? n + (n === 1 ? ' cue' : ' cues') + ' in your timestamps list' : 'No cues yet') + '</span></div>';
+    return h + '</div>';
+  }
   function renderShare(){
     var h = '';
     if (!net.code) {
@@ -1519,7 +1587,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
         if (takeoverOffered() || !net.peers) h += '<button class="btn small" data-share="take">Take over the clock</button>';
         else if (S.origHost === P.device) h += '<button class="btn small" data-share="take">Take the clock back</button>';
       }
-      h += '</div>' + gameActions(canControl(), 'Leave game');
+      h += '</div>' + cueSection() + gameActions(canControl(), 'Leave game');
     }
     if (net.msg) h += '<p class="add-err" role="alert">' + esc(net.msg) + '</p>';
     if (h !== cache.share) $('share-body').innerHTML = h;
@@ -1620,6 +1688,8 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   $('caption').addEventListener('click', onAct);
   $('toast-x').addEventListener('click', function(){ dismissed = last.capKey || null; paint(); });
   $('marks').addEventListener('click', function(e){
+    var cb = e.target.closest('[data-cue-edit]');
+    if (cb) { var c = findCue(cb.dataset.cueEdit); if (c) openCue(c, false); return; }
     var b = e.target.closest('[data-edit]'); if (!b || !canWrite()) return;
     var m = findMark(b.dataset.edit); if (m) openMark(m, false);
   });
@@ -1629,8 +1699,17 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   });
   $('mk-form').addEventListener('submit', function(e){
     e.preventDefault();
-    if (!editing || !canWrite()) return;
+    if (!editing) return;
     var t = parseClock($('mk-t').value);
+    if (editing.cue) {
+      if (!cueOwner()) return;
+      if (t < 0) { $('mk-err').hidden = false; $('mk-t').focus(); return; }
+      var c = findCue(editing.id);
+      if (!c) { if (CU.list.length >= 100) return; c = {id:editing.id}; CU.list.push(c); }
+      c.t = t; c.note = $('mk-note').value.replace(/\n/g, ' ').trim().slice(0, 120);
+      saveCues(); closePanels(true); render(); return;
+    }
+    if (!canWrite()) return;
     if (t < 0) { $('mk-err').hidden = false; $('mk-t').focus(); return; }
     var lp = clampInt($('mk-loop').value, 0, S.loop, S.loop);
     var note = $('mk-note').value.replace(/\n/g, ' ').trim().slice(0, 120);
@@ -1644,7 +1723,9 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   });
   $('mk-del').addEventListener('click', function(){
     if (!editing) return;
-    var id = editing.id; closePanels(true); removeMark(id);
+    var id = editing.id, cue = editing.cue; closePanels(true);
+    if (cue) { CU.list = CU.list.filter(function(c){ return c.id !== id; }); saveCues(); render(); }
+    else removeMark(id);
   });
   $('thumbs').addEventListener('click', function(e){
     var b = e.target.closest('[data-bg]'); if (!b || !canControl()) return;
@@ -1703,6 +1784,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   PANELS.forEach(function(x){ $(x[0]).addEventListener('click', function(){ togglePanel(x[1]); }); });
 
   $('share-body').addEventListener('change', function(e){
+    if (e.target.matches('[data-cue-on]')) { CU.on = e.target.checked && cueOwner(); saveCues(); render(); return; }
     if (!e.target.matches('[data-share-speed]')) return;
     if (!canControl()) { e.target.value = String(S.speed); return; }
     var rem = remainingMs(); S.speed = +e.target.value || 1;
@@ -1717,6 +1799,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     else if (act === 'take') takeClock();
     else if (act === 'new') { if (!canControl()) return; confirming = 'new'; closePanels(false); render(); }
     else if (act === 'retry') { if (net.code) joinGame(net.code, false); }
+    else if (act === 'cue-add') openCue({id:rid(), t:null, note:''}, true);
     else if (act === 'copy') {
       var url = SHARE_URL + '#' + net.code, note = $('copy-note');
       var done = function(){ note.textContent = 'Copied'; };
@@ -1767,6 +1850,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   /* ================= boot ================= */
   function boot(data){
     P = loadPrefs();
+    CU = loadCues();
     try { custom = localStorage.getItem(KEY + '-bg'); } catch(e){}
     var want = hashCode() || (typeof P.code === 'string' && /^[A-Z0-9]{4}$/.test(P.code) ? P.code : null);
     if (want) {

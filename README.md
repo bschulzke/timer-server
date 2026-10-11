@@ -22,12 +22,20 @@ The alarm and chimes are on by default only on the music device; anyone can turn
 Tracks live in `public/music/` (re-encoded to 128 kbps). They're by Kevin MacLeod (incompetech.com),
 licensed under Creative Commons: By Attribution 4.0. The credit is shown in the Sound dialog.
 
+## Private cues
+The device that hosted the game can turn on private cues in the Game panel: the GM's own reminders of
+planned events, like a guard change. Two minutes before each one, every loop, a silent heads-up appears
+on that device only, and the cues sit in its timestamps list marked "only you". They're kept in that
+browser's storage and never sent to the server, so players, and anyone who takes over the clock, can't
+see them. A GM who casts their screen to the TV should host from their phone and open the game on the TV.
+
 ## Run it on your computer
     npm install
     npm start            # http://localhost:3000
     npm test             # protocol checks
     python3 e2e.py       # two real browsers (needs playwright)
     python3 e2e_music.py # music: hand-off, rotation, final-minutes effect (about 2 minutes)
+    python3 e2e_cues.py  # private cues: host only, silent, never sent
 
 ## Deploy to the droplet
 First time:
