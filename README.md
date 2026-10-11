@@ -49,6 +49,47 @@ Logs: `docker compose logs -f timer`. Stop: `docker compose down` (add `-v` to a
 The Caddyfile also redirects tinytabletops.com and www to the timer, as a temporary (302) redirect.
 Delete that block once the domain gets its own site.
 
+## PR previews
+Every pull request from a branch in this repo gets its own copy of the app at
+`https://<PR number>.preview.tinytabletops.com`, posted as a comment on the PR, updated on every push and
+removed when the PR closes. Previews keep no saved data and never touch the live site. At most three run at once.
+
+How it fits together:
+- `.github/workflows/preview.yml` builds the PR **on GitHub's machines** and pushes the image to
+  `ghcr.io/bschulzke/timer-server`. PR code never runs on the droplet during a build.
+- It then SSHes to the droplet as `deploy` and sends `deploy <pr> <sha> <image digest>` (or `remove <pr>`).
+  That key can only run `sudo timer-preview` (a forced command), and `deploy` has no other rights: no shell,
+  no Docker access, one sudo rule for that one root-owned script.
+- `deploy/preview.sh` checks its input, pulls exactly that image by digest from that one registry address,
+  checks the image says it was built from that commit, and runs it locked down: as an unprivileged user, all
+  Linux capabilities dropped, no privilege escalation, read-only filesystem, memory/CPU/process limits, no
+  host folders or Docker socket, on its own `timer-previews` network that the live site isn't on.
+- Caddy is on both networks. It routes `<n>.preview.tinytabletops.com` to `timer-pr-<n>` and gets a
+  certificate for a name the first time it's visited, but only names listed in `/srv/previews/allowed`.
+
+One-time setup (droplet, as root):
+
+    # DNS first: an A record with host *.preview pointing at the droplet
+    cd ~/timer-server && git pull
+    adduser --disabled-password --gecos "" deploy
+    mkdir -p /srv/previews/allowed
+    install -o root -g root -m 755 deploy/preview.sh /usr/local/bin/timer-preview
+    printf '%s\n' 'Defaults!/usr/local/bin/timer-preview env_keep += "SSH_ORIGINAL_COMMAND"' \
+      'deploy ALL=(root) NOPASSWD: /usr/local/bin/timer-preview' > /etc/sudoers.d/timer-preview
+    chmod 440 /etc/sudoers.d/timer-preview && visudo -cf /etc/sudoers.d/timer-preview
+    ssh-keygen -t ed25519 -N "" -C github-preview -f /root/preview-key
+    install -d -o deploy -m 700 /home/deploy/.ssh
+    echo "command=\"sudo -n /usr/local/bin/timer-preview\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty $(cat /root/preview-key.pub)" > /home/deploy/.ssh/authorized_keys
+    chown deploy /home/deploy/.ssh/authorized_keys && chmod 600 /home/deploy/.ssh/authorized_keys
+    docker compose up -d --build
+
+Then add repository secrets on GitHub: `PREVIEW_HOST` (the droplet's IP), `PREVIEW_SSH_KEY` (the contents of
+`/root/preview-key`), and optionally `PREVIEW_KNOWN_HOSTS` (the output of `ssh-keyscan -t ed25519 <ip>`).
+Delete `/root/preview-key` from the droplet once the secret is saved. After the first preview build, make the
+`timer-server` package public on GitHub (Packages → timer-server → Package settings → Change visibility), so
+the droplet can pull it. `sudo timer-preview list` shows running previews. If `deploy/preview.sh` changes,
+re-run the `install` line.
+
 ## Settings (environment variables on the `timer` service)
 `MAX_AGE_HOURS` (default 72), `MAX_GAMES` (default 2000), `PORT`, `DATA_FILE`.
 

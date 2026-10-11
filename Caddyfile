@@ -1,4 +1,12 @@
 # Caddy gets and renews the HTTPS certificates by itself. DOMAIN comes from the .env file.
+{
+	# PR previews get their certificates when first visited, but only for names on the
+	# active-preview list (see the :9123 block below), so random names can't request one.
+	on_demand_tls {
+		ask http://localhost:9123/check
+	}
+}
+
 {$DOMAIN} {
 	encode gzip
 	reverse_proxy timer:3000
@@ -8,4 +16,31 @@
 # once tinytabletops.com gets its own site. Delete this block then.
 tinytabletops.com, www.tinytabletops.com {
 	redir https://{$DOMAIN}{uri} 302
+}
+
+# PR previews: 12.preview.tinytabletops.com is served by the container timer-pr-12.
+# deploy/preview.sh starts and removes those containers.
+*.preview.tinytabletops.com {
+	tls {
+		on_demand
+	}
+	encode gzip
+	@pr header_regexp pr Host ^(\d+)\.preview\.tinytabletops\.com$
+	handle @pr {
+		reverse_proxy timer-pr-{re.pr.1}:3000
+	}
+	handle {
+		respond "No preview here." 404
+	}
+}
+
+# Internal only: answers 200 when a preview name is on the active list (a file in /previews/allowed).
+http://localhost:9123 {
+	bind 127.0.0.1
+	@active file {
+		root /previews/allowed
+		try_files {query.domain}
+	}
+	respond @active 200
+	respond 404
 }

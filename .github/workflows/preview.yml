@@ -1,0 +1,115 @@
+# PR previews at https://<number>.preview.tinytabletops.com, removed when the PR closes.
+#
+# The PR is built here, on GitHub's machines, and pushed to ghcr.io/bschulzke/timer-server.
+# The droplet only pulls that exact image by digest and runs it, locked down (deploy/preview.sh).
+# Secrets: PREVIEW_HOST (droplet IP), PREVIEW_SSH_KEY (key locked to the preview script),
+# PREVIEW_KNOWN_HOSTS (optional; pins the droplet's SSH host key).
+name: PR preview
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: ${{ github.event.action != 'closed' }}
+
+permissions:
+  contents: read
+  packages: write
+  pull-requests: write
+
+env:
+  IMAGE: ghcr.io/bschulzke/timer-server
+
+jobs:
+  preview:
+    # Branches in this repo only. GitHub gives no secrets to PRs from forks anyway.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the PR
+        if: github.event.action != 'closed'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up Docker Buildx
+        if: github.event.action != 'closed'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub's container registry
+        if: github.event.action != 'closed'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push the preview image
+        if: github.event.action != 'closed'
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          provenance: false
+          tags: ${{ env.IMAGE }}:pr-${{ github.event.pull_request.number }}
+          labels: |
+            timer-preview=1
+            org.opencontainers.image.revision=${{ github.event.pull_request.head.sha }}
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+
+      - name: Deploy or remove the preview
+        id: ssh
+        env:
+          KEY: ${{ secrets.PREVIEW_SSH_KEY }}
+          HOST: ${{ secrets.PREVIEW_HOST }}
+          KNOWN: ${{ secrets.PREVIEW_KNOWN_HOSTS }}
+          PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+          ACTION: ${{ github.event.action }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/preview && chmod 600 ~/.ssh/preview
+          if [ -n "$KNOWN" ]; then printf '%s\n' "$KNOWN" > ~/.ssh/known_hosts
+          else ssh-keyscan -t ed25519 "$HOST" > ~/.ssh/known_hosts 2>/dev/null; fi
+          if [ "$ACTION" = closed ]; then CMD="remove $PR"; else CMD="deploy $PR $SHA $DIGEST"; fi
+          set +e
+          ssh -i ~/.ssh/preview -o BatchMode=yes deploy@"$HOST" "$CMD" > out.txt 2>&1
+          code=$?
+          set -e
+          cat out.txt
+          { echo 'result<<EOF'; tail -n 5 out.txt; echo 'EOF'; } >> "$GITHUB_OUTPUT"
+          exit $code
+
+      - name: Comment on the PR
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          RESULT: ${{ steps.ssh.outputs.result }}
+          OUTCOME: ${{ steps.ssh.outcome }}
+          BUILD: ${{ steps.build.outcome }}
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const marker = '<!-- pr-preview -->';
+            const short = pr.head.sha.slice(0, 7);
+            const out = (process.env.RESULT || '').trim();
+            let body;
+            if (context.payload.action === 'closed') {
+              body = `${marker}\n**Preview removed** (PR closed).`;
+            } else if (process.env.OUTCOME === 'success') {
+              const url = out.split('\n').filter(l => l.startsWith('https://')).pop();
+              body = `${marker}\n**Preview:** ${url}\n\nBuilt from ${short}. Updated on every push, removed when this PR closes. Preview games aren't saved and never touch the live site.`;
+            } else if (process.env.BUILD === 'failure') {
+              body = `${marker}\n**Preview failed:** the image for ${short} didn't build. See the workflow log.`;
+            } else {
+              body = `${marker}\n**Preview failed** for ${short}:\n\n\`\`\`\n${out || 'no output'}\n\`\`\``;
+            }
+            const { owner, repo } = context.repo;
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: pr.number });
+            const mine = comments.find(c => c.body && c.body.startsWith(marker));
+            if (mine) await github.rest.issues.updateComment({ owner, repo, comment_id: mine.id, body });
+            else await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body });

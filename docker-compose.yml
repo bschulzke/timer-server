@@ -18,10 +18,17 @@ services:
       DOMAIN: ${DOMAIN:?set DOMAIN in .env}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - /srv/previews/allowed:/previews/allowed:ro   # active PR previews (see deploy/preview.sh)
       - caddy-data:/data
       - caddy-config:/config
+    networks:
+      - default
+      - previews     # so Caddy can reach PR preview containers, which can't reach the live site
     depends_on:
       - timer
+networks:
+  previews:
+    name: timer-previews
 volumes:
   timer-data:
   caddy-data:
