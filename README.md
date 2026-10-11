@@ -87,7 +87,7 @@ Then add repository secrets on GitHub: `PREVIEW_HOST` (the droplet's IP), `PREVI
 `/root/preview-key`), and optionally `PREVIEW_KNOWN_HOSTS` (the output of `ssh-keyscan -t ed25519 <ip>`).
 Delete `/root/preview-key` from the droplet once the secret is saved. After the first preview build, make the
 `timer-server` package public on GitHub (Packages → timer-server → Package settings → Change visibility), so
-the droplet can pull it. `sudo timer-preview list` shows running previews. If `deploy/preview.sh` changes,
+the droplet can pull it. `sudo timer-preview list` on the droplet shows running previews. If `deploy/preview.sh` changes,
 re-run the `install` line.
 
 ## Settings (environment variables on the `timer` service)
