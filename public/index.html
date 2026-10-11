@@ -1698,7 +1698,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
       '<div class="luck-bar"><button class="btn primary" type="button" data-luck="yes">Spend them</button><button class="btn small" type="button" data-luck="no">Cancel</button></div></div>';
     else if (k) bar = '<div class="luck-bar"><button class="btn primary" type="button" data-luck="spend">Spend ' + k + '</button><button class="btn small" type="button" data-luck="clear">Clear</button></div>';
     else if (r) bar = '<div class="luck-bar"><button class="btn primary" type="button" data-luck="back">Bring back ' + r + '</button><button class="btn small" type="button" data-luck="clear">Clear</button></div>';
-    else bar = '<div class="luck-bar"><span class="hint">' + (!w ? 'This view can’t change the count.' : n ? 'Tap the dice you rolled, then spend them.' : 'No Luck Dice left this loop.') +
+    else bar = '<div class="luck-bar"><span class="hint">' + (!w ? 'This view can’t change the count.' : n ? 'Tap as many dice as you rolled, then spend them.' : 'No Luck Dice left this loop.') +
       (gm && n < 20 ? ' Tap faded dice to bring them back.' : '') + '</span></div>';
     var h = '<div class="luck-head"><h2>Luck Dice</h2><span><b>' + n + '</b> / 20</span></div><div class="dice">' + d + '</div>' + bar;
     if (h !== cache.luck) {
@@ -1755,7 +1755,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   function gameActions(control, leaveLabel){
     var h = '';
     if (control) h += '<label class="tog" for="luck-on"><input type="checkbox" id="luck-on" data-luck-on' + (S.luck ? ' checked' : '') + '>' +
-      '<span>Luck Dice counter<small>Shows the 20 Luck Dice to everyone. Tap dice to spend them. Resets each loop. Leave it off to use real dice.</small></span></label>';
+      '<span>Luck Dice counter<small>Shows everyone how many Luck Dice are left. Tap dice to spend them. Resets each loop. Leave it off to track with real dice.</small></span></label>';
     h += '<div class="row game-acts">';
     if (control) h += '<button class="btn small" data-share="new">New game</button>';
     h += '<button class="btn small" data-share="leave">' + leaveLabel + '</button></div>';

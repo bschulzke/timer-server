@@ -33,7 +33,7 @@ A GM who casts their screen to the TV should host from their phone and open the 
 
 ## Luck Dice counter
 Optional, off by default. The GM turns it on in the Game panel; then everyone sees the 20 Luck Dice above
-the timestamps. Tap the dice you rolled, Spend, and confirm. The GM can tap spent dice to bring them back.
+the timestamps. Tap as many dice as you rolled, Spend, and confirm. The GM can tap spent dice to bring them back.
 The count resets to 20 each loop and on New game. On the server the count changes only through the `luck`
 op (anyone may spend, only the GM may give back), so a clock write never undoes a spend.
 
