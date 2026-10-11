@@ -22,12 +22,14 @@ The alarm and chimes are on by default only on the music device; anyone can turn
 Tracks live in `public/music/` (re-encoded to 128 kbps). They're by Kevin MacLeod (incompetech.com),
 licensed under Creative Commons: By Attribution 4.0. The credit is shown in the Sound dialog.
 
-## Private cues
-The device that hosted the game can turn on private cues in the Game panel: the GM's own reminders of
+## Secret cues
+The device that hosted the game can turn on secret cues in the Game panel: the GM's own reminders of
 planned events, like a guard change. Two minutes before each one, every loop, a silent heads-up appears
 on that device only, and the cues sit in its timestamps list marked "only you". They're kept in that
 browser's storage and never sent to the server, so players, and anyone who takes over the clock, can't
-see them. Starting a new game clears them. A GM who casts their screen to the TV should host from their phone and open the game on the TV.
+see them. Starting a new game clears them. "Load a scenario" adds the timed events from one of the
+rulebook's scenarios (the list is `SCENARIOS` in `public/index.html`; keep it in step with the book).
+A GM who casts their screen to the TV should host from their phone and open the game on the TV.
 
 ## Run it on your computer
     npm install
@@ -35,7 +37,7 @@ see them. Starting a new game clears them. A GM who casts their screen to the TV
     npm test             # protocol checks
     python3 e2e.py       # two real browsers (needs playwright)
     python3 e2e_music.py # music: hand-off, rotation, final-minutes effect (about 2 minutes)
-    python3 e2e_cues.py  # private cues: host only, silent, never sent
+    python3 e2e_cues.py  # secret cues: host only, silent, never sent, scenario loading
     python3 e2e_clock.py # typing clock readings, microwave style
 
 ## Deploy to the droplet

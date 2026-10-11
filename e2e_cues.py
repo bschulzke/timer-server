@@ -1,4 +1,4 @@
-# Private GM cues in two real browsers. Run: python3 e2e_cues.py
+# Secret GM cues in two real browsers. Run: python3 e2e_cues.py
 import subprocess, time, os, re
 from playwright.sync_api import sync_playwright
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -34,12 +34,12 @@ try:
         gm.click('#btn-share'); gm.wait_for_timeout(300)
         code = re.search(r'#([A-Z0-9]{4})', gm.inner_text('#panel-share')).group(1)
         check(gm.query_selector('#cue-on') is not None and not gm.is_checked('#cue-on'), 'host sees the cue switch, off by default')
-        check('everyone will see your cues' in gm.inner_text('#panel-share'), 'switch comes with the TV warning')
+        check('players can see this screen' in gm.inner_text('#panel-share') and 'Shown on this device only' in gm.inner_text('#panel-share'), 'switch comes with the TV warning')
         gm.select_option('#speed', '10')
         gm.check('#cue-on'); gm.wait_for_timeout(200)
         gm.click('[data-share=cue-add]'); gm.wait_for_timeout(200)
         check(gm.is_visible('#mk-t') and not gm.is_visible('#mk-loop'), 'cue editor has a time but no loop')
-        check(gm.inner_text('#mk-title') == 'NEW PRIVATE CUE' or gm.inner_text('#mk-title').lower() == 'new private cue', 'editor is titled as a cue')
+        check(gm.inner_text('#mk-title').lower() == 'new secret cue', 'editor is titled as a secret cue')
         gm.fill('#mk-t', '59:30'); gm.fill('#mk-note', NOTE); gm.click('#mk-form [type=submit]'); gm.wait_for_timeout(300)
         rows = gm.query_selector_all('#marks .mark.cue')
         check(len(rows) == 1 and NOTE in rows[0].inner_text() and 'ONLY YOU' in rows[0].inner_text().upper(), 'cue shows in the host\'s list, marked only you')
@@ -88,6 +88,32 @@ try:
         check(gm.query_selector('#marks .mark.cue') is None, '...and they stay cleared after a reload')
         gm.click('#btn-menu'); gm.click('#btn-share'); gm.wait_for_timeout(200)
         check(gm.is_checked('#cue-on') and 'No cues yet' in gm.inner_text('#panel-share'), 'the switch stays on after New game')
+
+        # Loading a scenario's cues
+        count = lambda: len(gm.query_selector_all('#marks .mark.cue'))
+        gm.click('[data-share=cue-scen]'); gm.wait_for_timeout(200)
+        check(gm.is_visible('#panel-scen') and 'LOAD 3 CUES' in gm.inner_text('#scen-body').upper(), 'loader opens on the first scenario, with nothing to replace')
+        gm.click('[data-scen="1"]'); gm.wait_for_timeout(100)
+        check('Police arrive' in gm.inner_text('#scen-body') and 'LOAD 9 CUES' in gm.inner_text('#scen-body').upper(), 'picking Yacht-zee previews its 9 cues')
+        gm.click('[data-scen-go=replace]'); gm.wait_for_timeout(300)
+        check(count() == 9 and not gm.is_visible('#panel-scen'), 'Yacht-zee loads 9 cues into the list')
+        check('02:35' in gm.inner_text('#marks'), 'loaded cue shows its clock reading')
+        gm.click('#btn-menu'); gm.click('#btn-share'); gm.wait_for_timeout(200)
+        gm.click('[data-share=cue-scen]'); gm.wait_for_timeout(200)
+        gm.click('[data-scen="1"]'); gm.wait_for_timeout(100)
+        txt = gm.inner_text('#scen-body')
+        check('already in your list' in txt and gm.query_selector('[data-scen-go]') is None and 'LOADED' in txt.upper(),
+              'a scenario already loaded says so, with no Replace or Add')
+        gm.click('[data-scen="0"]'); gm.wait_for_timeout(100)
+        check('REPLACE YOUR 9 CUES' in gm.inner_text('#scen-body').upper(), 'a different scenario offers Replace or Add')
+        gm.click('[data-scen-go=add]'); gm.wait_for_timeout(300)
+        check(count() == 12, 'adding Clowning Around keeps the Yacht-zee cues')
+        gm.click('#btn-menu'); gm.click('#btn-share'); gm.wait_for_timeout(200)
+        gm.click('[data-share=cue-scen]'); gm.wait_for_timeout(200)
+        gm.click('[data-scen="2"]'); gm.click('[data-scen-go=replace]'); gm.wait_for_timeout(300)
+        check(count() == 2, 'replacing with Around the World leaves its 2 cues')
+        check(not any('Lund' in f for f in sent), 'loaded cues never go over the network')
+        gm.click('#btn-menu'); gm.click('#btn-share'); gm.wait_for_timeout(200)
         gm.uncheck('#cue-on'); gm.wait_for_timeout(200)
         check('[data-share=cue-add]' and gm.query_selector('[data-share=cue-add]') is None, 'turning cues off hides the add button')
         gm.click('#panel-share .panel-x')
