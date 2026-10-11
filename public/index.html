@@ -55,6 +55,8 @@
 html,body{height:100%}
 /* No zooming on phones: no double-tap zoom, and quick taps on buttons aren't delayed. */
 html{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+/* ...and no rubber-band bounce past the top or bottom of the page. */
+html,body{overscroll-behavior:none}
 body{
   background:
     linear-gradient(var(--line-faint) 1px,transparent 1px) 0 0/32px 32px,

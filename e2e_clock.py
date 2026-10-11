@@ -25,6 +25,7 @@ try:
         check('maximum-scale=1' in vp and 'user-scalable=no' in vp, 'the page asks phones not to zoom')
         check(pg.evaluate("getComputedStyle(document.querySelector('[data-luck], .btn')).touchAction") in ('auto', 'manipulation')
               and pg.evaluate("getComputedStyle(document.documentElement).touchAction") == 'manipulation', 'double-tap zoom is off')
+        check(pg.evaluate("getComputedStyle(document.documentElement).overscrollBehaviorY") == 'none', 'no bounce past the ends of the page')
         cancelled = pg.evaluate("() => { const e = new Event('gesturestart', {cancelable: true}); document.dispatchEvent(e); return e.defaultPrevented; }")
         check(cancelled, 'pinch gestures are stopped (iPhone)')
         fresh()
