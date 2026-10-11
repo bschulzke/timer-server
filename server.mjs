@@ -226,7 +226,6 @@ function handle(ws, m) {
       const delta = Math.round(+m.delta);
       if (!Number.isFinite(delta) || delta === 0 || Math.abs(delta) > 20) return bad();
       if (!g.game.luck) return bad('failed_precondition');
-      if (delta > 0 && ws.device !== g.game.hostId) return bad('rejected');     // only the GM gives dice back
       g.game = { ...g.game, dice: Math.min(20, Math.max(0, g.game.dice + delta)), updatedAt: Date.now() };
       g.touched = Date.now(); saveSoon();
       reply(ws, rid, { ok: true });

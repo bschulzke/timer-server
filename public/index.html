@@ -266,23 +266,20 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
 .mark .x:hover{color:var(--alarm)}
 .mark.passed{opacity:.45}
 .mark.soon{background:rgba(222,177,72,.16)}
-/* Luck Dice counter: 20 dice above the timestamps. Tap to pick, then spend. */
+/* Luck Dice counter: 20 dice above the timestamps, with − and + beside the count. */
 .luck{padding:12px 14px;border-bottom:1px solid var(--line-dim);display:grid;gap:10px}
-.luck-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
-.luck-head span{font:400 12px/1 var(--mono);color:var(--line)}
-.luck-head b{font:400 20px/1 var(--display);color:var(--amber);margin-right:2px}
+.luck-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.luck-count{display:flex;align-items:center;gap:10px}
+.luck-count span{font:400 12px/1 var(--mono);color:var(--line);min-width:58px;text-align:center;white-space:nowrap}
+.luck-count b{font:400 20px/1 var(--display);color:var(--amber);margin-right:2px}
+.luck-step{width:40px;height:40px;padding:0;border:1.5px solid var(--amber);border-radius:4px;background:rgba(222,177,72,.08);color:var(--amber);font:400 24px/1 var(--display);cursor:pointer;display:grid;place-items:center}
+.luck-step:active:not(:disabled){background:var(--amber);color:var(--navy)}
+.luck-step:disabled{border-color:var(--line-dim);color:rgba(166,199,242,.28);background:none;cursor:default}
 .dice{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px;max-width:440px}
-.die{aspect-ratio:1;min-width:0;padding:0;border:1.5px solid var(--amber);border-radius:4px;background:rgba(222,177,72,.12);color:var(--amber);cursor:pointer;transition:transform .08s;display:block}
+.die{aspect-ratio:1;min-width:0;border:1.5px solid var(--amber);border-radius:4px;background:rgba(222,177,72,.12);color:var(--amber);transition:background .15s,color .15s,border-color .15s}
 .die svg{display:block;width:100%;height:100%}
-.die[aria-pressed="true"]{background:var(--amber);color:var(--navy);transform:translateY(-3px);box-shadow:0 3px 0 var(--shadow)}
 .die.off{border-color:var(--line-dim);background:none;color:rgba(166,199,242,.28)}
-.die.off[aria-pressed="true"]{border:1.5px dashed var(--line);background:none;color:var(--line);transform:none;box-shadow:none}
-.die:disabled{cursor:default}
-.luck-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-.luck-bar .hint{font-size:12.5px}
-.luck-ok{border:1px solid var(--amber);background:rgba(222,177,72,.08);padding:10px 12px;display:grid;gap:10px}
-.luck-ok p{margin:0;font:400 14px/1.35 var(--mono);color:var(--paper)}
-.luck .btn.primary{font-size:12px;padding:10px 14px;box-shadow:none}
+.luck .hint{font-size:12.5px;margin:0}
 /* Secret GM cues: only on the hosting device, never synced. */
 #panel-scen{width:min(480px,calc(100% - 32px))}
 .scen-list{display:grid;gap:6px}
@@ -938,7 +935,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     // The music device changes without a new rev, so always take it from the latest copy.
     if (net.synced && next.dj !== S.dj) { S.dj = next.dj; renderSound(); }
     // Luck Dice are spent without a new rev too.
-    if (net.synced && next.dice !== S.dice) { S.dice = next.dice; renderLuck(); }
+    if (net.synced) luckFromServer(next.dice); else LD.srv = next.dice;
     if (net.synced && next.rev < S.rev) return;                                   // an older write arriving late
     if (net.synced && next.rev === S.rev && next.hostId === S.hostId && S.hostId === P.device) {   // our own echo
       if (net.status !== 'live') { net.status = 'live'; render(); }                                   // ...which also means the connection is back
@@ -1663,9 +1660,10 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   }
 
   /* ================= Luck Dice ================= */
-  // Picks stay on this device until spent. pick = available dice chosen to spend;
-  // back = spent dice the GM has chosen to give back.
-  var LD = {pick:{}, back:{}, ask:false, busy:false};
+  // Anyone can tap − to spend a die or + to put one back. Each tap shows at once and sends its own
+  // +1 or −1, so quick taps and taps from several players all add up on the server.
+  // pend = taps not yet answered; srv = the last count the server sent.
+  var LD = {pend:0, srv:null};
   // Each die always shows the same face, just for looks, like a handful of dice already rolled.
   var DIE_FACES = [3, 5, 1, 6, 2, 4, 4, 2, 6, 1, 5, 3, 2, 6, 3, 5, 1, 4, 6, 2];
   var PIPS = {1:['5,5'], 2:['3,3','7,7'], 3:['3,3','5,5','7,7'], 4:['3,3','7,3','3,7','7,7'],
@@ -1676,63 +1674,49 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     }).join('') + '</svg>';
   }
   function luckOn(){ return inGame() && !!S.luck; }
-  function luckClear(){ LD.pick = {}; LD.back = {}; LD.ask = false; }
+  // A count from the server. While our own taps are still on their way it would be out of date, so wait.
+  function luckFromServer(d){
+    LD.srv = d;
+    if (!LD.pend && d !== S.dice) { S.dice = d; renderLuck(); }
+  }
   function renderLuck(){
     var box = $('luck'), on = luckOn();
     box.hidden = !on;
-    if (!on) { luckClear(); cache.luck = ''; box.innerHTML = ''; return; }
-    var n = S.dice, w = canWrite(), gm = canControl();
-    Object.keys(LD.pick).forEach(function(i){ if (+i >= n) delete LD.pick[i]; });
-    Object.keys(LD.back).forEach(function(i){ if (+i < n) delete LD.back[i]; });
-    var k = Object.keys(LD.pick).length, r = Object.keys(LD.back).length;
-    if (!k) LD.ask = false;
+    if (!on) { cache.luck = ''; box.innerHTML = ''; return; }
+    var n = S.dice, w = canWrite();
     var d = '';
-    for (var i = 0; i < 20; i++) {
-      var spent = i >= n, picked = spent ? !!LD.back[i] : !!LD.pick[i];
-      var can = spent ? gm : w;
-      d += '<button type="button" class="die' + (spent ? ' off' : '') + '" data-die="' + i + '" aria-pressed="' + picked + '"' +
-        (can ? '' : ' disabled') + ' aria-label="Luck die ' + (i + 1) + (spent ? ', spent' : '') + '">' + dieFace(i) + '</button>';
-    }
-    var bar;
-    if (LD.ask) bar = '<div class="luck-ok" role="alertdialog" aria-label="Spend Luck Dice"><p>Spend ' + k + ' Luck ' + (k === 1 ? 'Die' : 'Dice') + '? ' + (n - k) + ' left this loop.</p>' +
-      '<div class="luck-bar"><button class="btn primary" type="button" data-luck="yes">Spend them</button><button class="btn small" type="button" data-luck="no">Cancel</button></div></div>';
-    else if (k) bar = '<div class="luck-bar"><button class="btn primary" type="button" data-luck="spend">Spend ' + k + '</button><button class="btn small" type="button" data-luck="clear">Clear</button></div>';
-    else if (r) bar = '<div class="luck-bar"><button class="btn primary" type="button" data-luck="back">Bring back ' + r + '</button><button class="btn small" type="button" data-luck="clear">Clear</button></div>';
-    else bar = '<div class="luck-bar"><span class="hint">' + (!w ? 'This view can’t change the count.' : n ? 'Tap as many dice as you rolled, then spend them.' : 'No Luck Dice left this loop.') +
-      (gm && n < 20 ? ' Tap faded dice to bring them back.' : '') + '</span></div>';
-    var h = '<div class="luck-head"><h2>Luck Dice</h2><span><b>' + n + '</b> / 20</span></div><div class="dice">' + d + '</div>' + bar;
+    for (var i = 0; i < 20; i++) d += '<span class="die' + (i >= n ? ' off' : '') + '">' + dieFace(i) + '</span>';
+    var step = function(act, sym, label, ok){
+      return w ? '<button type="button" class="luck-step" data-luck="' + act + '" aria-label="' + label + '"' + (ok ? '' : ' disabled') + '>' + sym + '</button>' : '';
+    };
+    var h = '<div class="luck-head"><h2>Luck Dice</h2><div class="luck-count">' +
+      step('spend', '−', 'Spend a Luck Die', n > 0) +
+      '<span role="status" aria-label="' + n + ' of 20 Luck Dice left"><b>' + n + '</b> / 20</span>' +
+      step('add', '+', 'Put a Luck Die back', n < 20) + '</div></div>' +
+      '<div class="dice" aria-hidden="true">' + d + '</div>' +
+      (w ? '' : '<p class="hint">This view can’t change the count.</p>');
     if (h !== cache.luck) {
-      var fid = document.activeElement && box.contains(document.activeElement) ? (document.activeElement.dataset.die || document.activeElement.dataset.luck) : null;
+      var fid = document.activeElement && box.contains(document.activeElement) ? document.activeElement.dataset.luck : null;
       box.innerHTML = h; cache.luck = h;
-      if (fid != null) { var f = box.querySelector('[data-die="' + fid + '"]') || box.querySelector('[data-luck="' + fid + '"]') || box.querySelector('[data-luck]'); if (f) f.focus(); }
+      if (fid) { var f = box.querySelector('[data-luck="' + fid + '"]:not(:disabled)') || box.querySelector('[data-luck]:not(:disabled)'); if (f) f.focus(); }
     }
   }
   function luckChange(delta){
-    if (!luckOn() || LD.busy) return;
-    var before = S.dice;
-    S.dice = Math.min(20, Math.max(0, S.dice + delta));
-    luckClear();
+    if (!luckOn() || !canWrite()) return;
+    var next = Math.min(20, Math.max(0, S.dice + delta));
+    if (next === S.dice) return;
+    S.dice = next;
     if (!net.code) { saveLocal(); renderLuck(); return; }
-    LD.busy = true; renderLuck();
-    net.t.luck(net.code, delta).then(function(){ LD.busy = false; }, function(e){
-      LD.busy = false; if (S.dice === before + delta) S.dice = before; writeFailed(e); renderLuck();
+    LD.pend++; renderLuck();
+    net.t.luck(net.code, delta).then(function(){ LD.pend--; }, function(e){
+      LD.pend--; writeFailed(e);
+      if (!LD.pend && LD.srv != null) { S.dice = LD.srv; renderLuck(); }    // undo what didn't go through
     });
   }
   $('luck').addEventListener('click', function(e){
-    var b = e.target.closest('[data-die]');
-    if (b && !b.disabled) {
-      var i = +b.dataset.die;
-      if (i < S.dice) { if (!canWrite()) return; LD.back = {}; if (LD.pick[i]) delete LD.pick[i]; else LD.pick[i] = 1; }
-      else { if (!canControl()) return; LD.pick = {}; LD.ask = false; if (LD.back[i]) delete LD.back[i]; else LD.back[i] = 1; }
-      renderLuck(); return;
-    }
-    var a = e.target.closest('[data-luck]'); if (!a) return;
-    var act = a.dataset.luck;
-    if (act === 'spend') { LD.ask = true; renderLuck(); }
-    else if (act === 'no') { LD.ask = false; renderLuck(); }
-    else if (act === 'clear') { luckClear(); renderLuck(); }
-    else if (act === 'yes') { var k = Object.keys(LD.pick).length; if (k && canWrite()) luckChange(-k); }
-    else if (act === 'back') { var r = Object.keys(LD.back).length; if (r && canControl()) luckChange(r); }
+    var a = e.target.closest('[data-luck]'); if (!a || a.disabled) return;
+    if (a.dataset.luck === 'spend') luckChange(-1);
+    else if (a.dataset.luck === 'add') luckChange(1);
   });
 
   function peerCount(){ var seen = {}; (net.peers || []).forEach(function(d){ seen[d] = 1; }); return Object.keys(seen).length; }
@@ -1755,7 +1739,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   function gameActions(control, leaveLabel){
     var h = '';
     if (control) h += '<label class="tog" for="luck-on"><input type="checkbox" id="luck-on" data-luck-on' + (S.luck ? ' checked' : '') + '>' +
-      '<span>Luck Dice counter<small>Shows everyone how many Luck Dice are left. Tap dice to spend them. Resets each loop. Leave it off to track with real dice.</small></span></label>';
+      '<span>Luck Dice counter<small>Shows everyone how many Luck Dice are left. Tap − to spend them. Resets each loop. Leave it off to track with real dice.</small></span></label>';
     h += '<div class="row game-acts">';
     if (control) h += '<button class="btn small" data-share="new">New game</button>';
     h += '<button class="btn small" data-share="leave">' + leaveLabel + '</button></div>';
@@ -2034,7 +2018,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   $('share-body').addEventListener('change', function(e){
     if (e.target.matches('[data-luck-on]')) {
       if (!canControl()) { e.target.checked = !!S.luck; return; }
-      S.luck = e.target.checked; luckClear(); commit(); render(); return;
+      S.luck = e.target.checked; commit(); render(); return;
     }
     if (e.target.matches('[data-cue-on]')) { CU.on = e.target.checked && cueOwner(); saveCues(); render(); return; }
     if (!e.target.matches('[data-share-speed]')) return;

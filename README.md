@@ -33,9 +33,10 @@ A GM who casts their screen to the TV should host from their phone and open the 
 
 ## Luck Dice counter
 Optional, off by default. The GM turns it on in the Game panel; then everyone sees the 20 Luck Dice above
-the timestamps. Tap as many dice as you rolled, Spend, and confirm. The GM can tap spent dice to bring them back.
-The count resets to 20 each loop and on New game. On the server the count changes only through the `luck`
-op (anyone may spend, only the GM may give back), so a clock write never undoes a spend.
+the timestamps, with − and + on either side of the count. Anyone can tap − to spend a die or + to put one back
+(to fix a slip; the table is trusted not to cheat). The count resets to 20 each loop and on New game. On the
+server the count changes only through the `luck` op, which adds or takes away from the current count, so taps
+from several players at once all count, and a clock write never undoes a spend.
 
 ## Run it on your computer
     npm install
@@ -45,7 +46,7 @@ op (anyone may spend, only the GM may give back), so a clock write never undoes 
     python3 e2e_music.py # music: hand-off, rotation, final-minutes effect (about 2 minutes)
     python3 e2e_cues.py  # secret cues: host only, silent, never sent, scenario loading
     python3 e2e_clock.py # typing clock readings, microwave style
-    python3 e2e_luck.py  # Luck Dice counter: spend, give back, resets, solo
+    python3 e2e_luck.py  # Luck Dice counter: − and +, sync, resets, solo
 
 ## Deploy to the droplet
 First time:

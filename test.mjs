@@ -64,8 +64,8 @@ ok((await p1.req({ op: 'luck', code: 'ABCD', delta: -3 })).code === 'failed_prec
 await gm.req({ op: 'write', code: 'ABCD', game: game({ phase: 'paused', rev: 6, luck: true }) });
 ok((await rd()).dice === 20, 'counter starts at 20');
 ok((await p1.req({ op: 'luck', code: 'ABCD', delta: -3 })).ok && (await rd()).dice === 17, 'a player spends 3');
-ok((await p1.req({ op: 'luck', code: 'ABCD', delta: 2 })).code === 'rejected', 'a player cannot give dice back');
-ok((await gm.req({ op: 'luck', code: 'ABCD', delta: 1 })).ok && (await rd()).dice === 18, 'the GM gives one back');
+ok((await p1.req({ op: 'luck', code: 'ABCD', delta: 2 })).ok && (await rd()).dice === 19, 'a player can add dice back');
+ok((await gm.req({ op: 'luck', code: 'ABCD', delta: -1 })).ok && (await rd()).dice === 18, 'the GM spends one');
 await gm.req({ op: 'write', code: 'ABCD', game: game({ phase: 'running', deadline: Date.now() + 1e6, rev: 7, luck: true, dice: 20 }) });
 ok((await rd()).dice === 18, 'a clock write in the same loop keeps the count');
 await p1.req({ op: 'luck', code: 'ABCD', delta: -20 });
