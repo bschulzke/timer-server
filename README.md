@@ -36,6 +36,7 @@ see them. A GM who casts their screen to the TV should host from their phone and
     python3 e2e.py       # two real browsers (needs playwright)
     python3 e2e_music.py # music: hand-off, rotation, final-minutes effect (about 2 minutes)
     python3 e2e_cues.py  # private cues: host only, silent, never sent
+    python3 e2e_clock.py # typing clock readings, microwave style
 
 ## Deploy to the droplet
 First time:

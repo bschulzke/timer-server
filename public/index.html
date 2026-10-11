@@ -419,11 +419,11 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
         <div class="panel-head"><h2 id="mk-title">New timestamp</h2><button class="panel-x" data-close aria-label="Discard and close">×</button></div>
         <form class="mk" id="mk-form" novalidate>
           <div class="mk-top">
-            <div class="fld"><label for="mk-t">Clock reading</label><input id="mk-t" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="14:00"></div>
+            <div class="fld"><label for="mk-t">Clock reading</label><input id="mk-t" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="00:00"></div>
             <div class="fld"><label for="mk-loop">Happened in</label><select id="mk-loop"></select></div>
           </div>
           <div class="fld"><label for="mk-note" id="mk-note-k">What happened</label><textarea id="mk-note" rows="3" maxlength="120" placeholder="e.g. guard leaves the gate"></textarea></div>
-          <p class="add-err" id="mk-err" role="alert" hidden>Enter what the clock read, in minutes and seconds, like 14:00.</p>
+          <p class="add-err" id="mk-err" role="alert" hidden>Enter the time on the clock, from 00:00 to 60:00.</p>
           <div class="mk-btns"><button class="btn primary" type="submit">Save</button><button class="btn quiet" type="button" data-close>Cancel</button><button class="btn small mk-del" type="button" id="mk-del">Delete</button></div>
         </form>
       </section>
@@ -681,10 +681,16 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   function remainingMs(){ return S.phase === 'running' ? Math.max(0, (S.deadline - nowMs()) * S.speed) : S.remaining; }
   function secs(){ return Math.ceil(remainingMs() / 1000); }
   function findMark(id){ return S.marks.filter(function(m){ return m.id === id; })[0]; }
+  // Clock readings are typed like a microwave: digits fill in from the right, so 3 is 00:03 and
+  // 315 is 03:15. Seconds past 59 roll over (01:75 is 02:15). Returns -1 if empty or over 60:00.
+  function clockDigits(str){ return String(str).replace(/\D/g, '').replace(/^0+/, '').slice(-4); }
+  function showDigits(d){ if (!d) return ''; d = ('0000' + d).slice(-4); return d.slice(0, 2) + ':' + d.slice(2); }
   function parseClock(str){
-    var m = /^(\d{1,2})(?::(\d{1,2}))?$/.exec(String(str).trim());
-    var t = m ? (+m[1]) * 60 + (+(m[2] || 0)) : -1;
-    return (!m || +(m[2] || 0) > 59 || t > HOUR) ? -1 : t;
+    var d = clockDigits(str);
+    if (!String(str).replace(/\D/g, '')) return -1;
+    d = ('0000' + d).slice(-4);
+    var t = (+d.slice(0, 2)) * 60 + (+d.slice(2));
+    return t > HOUR ? -1 : t;
   }
 
   /* ================= private cues =================
@@ -1697,6 +1703,32 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     // Between loops, a hand-entered mark most likely belongs to the loop that just ended.
     openMark({id:rid(), t:null, loop:S.phase === 'ready' && S.loop > 1 ? S.loop - 1 : S.loop, note:''}, true);
   });
+  // The clock field: typing pushes digits in from the right; backspace takes the last one off.
+  // The first digit typed after the field gets focus starts a fresh time, so an existing reading
+  // doesn't get pushed sideways.
+  (function(){
+    var f = $('mk-t'), fresh = true;
+    function set(d){ f.value = showDigits(d); var n = f.value.length; try { f.setSelectionRange(n, n); } catch(e){} $('mk-err').hidden = true; }
+    f.addEventListener('focus', function(){ fresh = true; });
+    f.addEventListener('beforeinput', function(e){
+      var t = e.inputType || '', d = clockDigits(f.value), whole = /Paste|Replacement|Drop/.test(t);
+      if (/^insert/.test(t)) {
+        e.preventDefault();
+        var add = String(e.data || (e.dataTransfer && e.dataTransfer.getData('text')) || '').replace(/\D/g, '');
+        if (!add) return;
+        if (fresh || whole || (f.value && f.selectionStart === 0 && f.selectionEnd === f.value.length)) d = '';
+        d = d + add;
+        if (d.length > 4) d = d.replace(/^0+/, '');
+        if (d.length > 4) d = whole ? d.slice(-4) : d.slice(0, 4);
+        fresh = false; set(d);
+      } else if (/^delete/.test(t)) {
+        e.preventDefault();
+        fresh = false; set(d.slice(0, -1));
+      }
+    });
+    // Browsers without beforeinput (or autofill): tidy whatever landed in the field.
+    f.addEventListener('input', function(){ fresh = false; set(clockDigits(f.value)); });
+  })();
   $('mk-form').addEventListener('submit', function(e){
     e.preventDefault();
     if (!editing) return;
