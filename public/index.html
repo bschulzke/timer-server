@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0A3057">
 <title>Shenan-Again Loop Timer</title>
 <meta name="shenan-ws" content="">
@@ -53,6 +53,8 @@
   --bg-strength:.4;
 }
 html,body{height:100%}
+/* No zooming on phones: no double-tap zoom, and quick taps on buttons aren't delayed. */
+html{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{
   background:
     linear-gradient(var(--line-faint) 1px,transparent 1px) 0 0/32px 32px,
@@ -473,6 +475,11 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   var TEST = /[?&]test\b/.test(location.search);   // ?test in the address shows the clock-speed setting
   var SKEW = 0;   // add to Date.now() to get server time; set by the self-hosted transport
   function nowMs(){ return Date.now() + SKEW; }
+  // iPhones allow pinch zoom whatever the page says, so stop the gesture itself.
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(function(t){
+    document.addEventListener(t, function(e){ e.preventDefault(); }, {passive: false});
+  });
+  document.addEventListener('touchmove', function(e){ if (e.touches.length > 1) e.preventDefault(); }, {passive: false});
   var HOUR = 3600, KEY = 'shenan-timer-v1', C = 2 * Math.PI * 176, GRACE = 30000;
   var SHARE_URL = 'https://claude.ai/artifact/Ezgp29R9uCECGqWPBxJXAZ';
   var PHASES = ['ready', 'running', 'paused', 'caught', 'won'];

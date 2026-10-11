@@ -21,6 +21,12 @@ try:
         def save():
             pg.click('#mk-form [type=submit]'); pg.wait_for_timeout(200)
 
+        vp = pg.get_attribute('meta[name=viewport]', 'content')
+        check('maximum-scale=1' in vp and 'user-scalable=no' in vp, 'the page asks phones not to zoom')
+        check(pg.evaluate("getComputedStyle(document.querySelector('[data-luck], .btn')).touchAction") in ('auto', 'manipulation')
+              and pg.evaluate("getComputedStyle(document.documentElement).touchAction") == 'manipulation', 'double-tap zoom is off')
+        cancelled = pg.evaluate("() => { const e = new Event('gesturestart', {cancelable: true}); document.dispatchEvent(e); return e.defaultPrevented; }")
+        check(cancelled, 'pinch gestures are stopped (iPhone)')
         fresh()
         check(pg.get_attribute('#mk-t', 'inputmode') == 'numeric', 'number pad keyboard')
         # Safari stops typing at maxlength before the page can step in, and 00:03 is already 5 characters.
