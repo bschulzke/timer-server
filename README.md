@@ -42,12 +42,26 @@ First time:
 
 4. Open `https://timer.tinytabletops.com`. Caddy fetches the certificates on its own.
 
-Update: push from your PC, then on the droplet `cd ~/timer-server && git pull && docker compose up -d --build`.
+Update: merging to `main` deploys automatically (see "Automatic deploys"). By hand: `cd ~/timer-server && git pull && docker compose up -d --build`.
 Games survive the rebuild (they live in a Docker volume named after the folder, so keep the folder name).
 Logs: `docker compose logs -f timer`. Stop: `docker compose down` (add `-v` to also erase saved games and certificates).
 
 The Caddyfile also redirects tinytabletops.com and www to the timer, as a temporary (302) redirect.
 Delete that block once the domain gets its own site.
+
+## Automatic deploys
+Merging to `main` updates the live site. `.github/workflows/deploy.yml` builds `main` on GitHub's machines,
+pushes it to `ghcr.io/bschulzke/timer-server`, and sends `live <sha> <digest>` through the same locked-down
+SSH key and script as the previews. On the droplet the script checks the commit is on `main` and the image says
+it was built from it, checks out that commit in `/root/timer-server` (so compose and Caddy changes come along),
+switches the `timer` service to that exact image, and waits until it answers. Saved games carry over.
+Caddy is restarted only when the Caddyfile changed.
+
+To roll back, open the Actions tab, find the deploy for the commit you want, and re-run it. You can still
+deploy by hand with `git pull && docker compose up -d --build`.
+
+The deploy script itself is not updated by deploys: changes to `deploy/preview.sh` take effect only when you
+re-run its `install` line on the droplet, so nothing merged can quietly change what the deploy key may do.
 
 ## PR previews
 Every pull request from a branch in this repo gets its own copy of the app at

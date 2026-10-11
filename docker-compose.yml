@@ -1,5 +1,8 @@
 services:
   timer:
+    # Auto-deploy sets TIMER_IMAGE to the exact image GitHub built from main. A manual
+    # `docker compose up -d --build` still builds locally, as before.
+    image: ${TIMER_IMAGE:-timer-server-timer}
     build: .
     restart: unless-stopped
     environment:
@@ -8,6 +11,14 @@ services:
       - timer-data:/data
     expose:
       - "3000"
+    # Locked down like the previews: read-only except saved games, no extra privileges.
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
