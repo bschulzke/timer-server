@@ -762,13 +762,21 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
       ['07:20', 'Lund’s spacewalk ends']]}
   ];
   var scenPick = 0;
+  // True when every cue of the scenario is already in the list.
+  function scenLoaded(sc){
+    return sc.cues.every(function(c){
+      var t = parseClock(c[0]);
+      return CU.list.some(function(x){ return x.t === t && x.note === c[1]; });
+    });
+  }
   function renderScen(){
-    var sc = SCENARIOS[scenPick], n = CU.list.length, k = sc.cues.length;
+    var sc = SCENARIOS[scenPick], n = CU.list.length, k = sc.cues.length, here = scenLoaded(sc);
     var h = '<div class="scen-list" role="radiogroup" aria-label="Scenario">' + SCENARIOS.map(function(s, i){
-        return '<button type="button" class="scen-opt" role="radio" aria-checked="' + (i === scenPick) + '" data-scen="' + i + '"><span>' + esc(s.name) + '</span><span class="hint">' + s.cues.length + ' cues</span></button>';
+        return '<button type="button" class="scen-opt" role="radio" aria-checked="' + (i === scenPick) + '" data-scen="' + i + '"><span>' + esc(s.name) + '</span><span class="hint">' + (scenLoaded(s) ? 'Loaded' : s.cues.length + ' cues') + '</span></button>';
       }).join('') + '</div>' +
       '<div class="mk-btns">' +
-      (n ? '<button class="btn primary" type="button" data-scen-go="replace">Replace your ' + n + (n === 1 ? ' cue' : ' cues') + '</button>' +
+      (here ? '<p class="hint">These cues are already in your list.</p>'
+       : n ? '<button class="btn primary" type="button" data-scen-go="replace">Replace your ' + n + (n === 1 ? ' cue' : ' cues') + '</button>' +
            '<button class="btn" type="button" data-scen-go="add">Add to them</button>'
          : '<button class="btn primary" type="button" data-scen-go="replace">Load ' + k + ' cues</button>') + '</div>' +
       '<ol class="scen-prev" aria-label="Cues in ' + esc(sc.name) + '">' + sc.cues.map(function(c){
