@@ -27,7 +27,7 @@ The device that hosted the game can turn on private cues in the Game panel: the 
 planned events, like a guard change. Two minutes before each one, every loop, a silent heads-up appears
 on that device only, and the cues sit in its timestamps list marked "only you". They're kept in that
 browser's storage and never sent to the server, so players, and anyone who takes over the clock, can't
-see them. A GM who casts their screen to the TV should host from their phone and open the game on the TV.
+see them. Starting a new game clears them. A GM who casts their screen to the TV should host from their phone and open the game on the TV.
 
 ## Run it on your computer
     npm install

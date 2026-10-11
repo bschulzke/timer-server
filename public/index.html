@@ -443,7 +443,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   var HOUR = 3600, KEY = 'shenan-timer-v1', C = 2 * Math.PI * 176, GRACE = 30000;
   var SHARE_URL = 'https://claude.ai/artifact/Ezgp29R9uCECGqWPBxJXAZ';
   var PHASES = ['ready', 'running', 'paused', 'caught', 'won'];
-  var GAME_KEYS = ['loop', 'phase', 'remaining', 'deadline', 'speed', 'won', 'bg', 'hostId', 'origHost', 'rev', 'dj'];
+  var GAME_KEYS = ['loop', 'phase', 'remaining', 'deadline', 'speed', 'won', 'bg', 'hostId', 'origHost', 'rev', 'dj', 'gid'];
   var $ = function(id){ return document.getElementById(id); };
   var BGS = [
     {id:'grid',   name:'Blank sheet'},
@@ -598,7 +598,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   function clampInt(v, lo, hi, d){ v = Math.round(+v); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; }
   function fresh(){
     return {loop:1, phase:'ready', remaining:HOUR*1000, deadline:null, speed:1, won:null, bg:'vault',
-            hostId:null, origHost:null, rev:0, dj:null, marks:[]};
+            hostId:null, origHost:null, rev:0, dj:null, gid:rid(), marks:[]};   // gid: new for every new game
   }
   // Everything read from storage or from other devices goes through these two.
   function cleanGame(g){
@@ -615,6 +615,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     o.origHost = typeof g.origHost === 'string' ? g.origHost.slice(0, 40) : null;
     o.rev = typeof g.rev === 'number' && isFinite(g.rev) ? g.rev : 0;
     o.dj = typeof g.dj === 'string' ? g.dj.slice(0, 40) : null;
+    o.gid = typeof g.gid === 'string' ? g.gid.slice(0, 40) : null;
     return o;
   }
   function cleanMark(m){
@@ -697,13 +698,14 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
      The GM's own reminders of planned events. They live only in this browser's storage and are
      never sent to the server, so players can't see them, and neither can anyone who takes over
      the clock. Only the device that hosted the game gets them. */
-  var CUE_KEY = KEY + '-cues', CU = {on:false, list:[]};
+  var CUE_KEY = KEY + '-cues', CU = {on:false, gid:null, list:[]};
   function loadCues(){
-    var c = {on:false, list:[]};
+    var c = {on:false, gid:null, list:[]};
     try {
       var r = JSON.parse(localStorage.getItem(CUE_KEY) || 'null');
       if (r) {
         c.on = !!r.on;
+        c.gid = typeof r.gid === 'string' ? r.gid.slice(0, 40) : null;
         if (Array.isArray(r.list)) c.list = r.list.filter(function(x){ return x && typeof x.id === 'string'; }).slice(0, 100)
           .map(function(x){ return {id:x.id.slice(0, 40), t:clampInt(x.t, 0, HOUR, 0), note:String(x.note || '').slice(0, 120)}; });
       }
@@ -714,6 +716,13 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   function findCue(id){ return CU.list.filter(function(c){ return c.id === id; })[0]; }
   function cueOwner(){ return !!net.code && !!S.origHost && S.origHost === P.device; }
   function cuesShown(){ return cueOwner() && CU.on; }
+  // Cues belong to one game. When the host device sees a new game (New game, from any device, or a
+  // freshly hosted one), it clears them. The switch stays as it was.
+  function cueGame(){
+    if (!cueOwner() || !S.gid || CU.gid === S.gid) return;
+    if (CU.gid) CU.list = [];
+    CU.gid = S.gid; saveCues();
+  }
 
   /* ================= roles ================= */
   // On the start screen until a game is hosted, joined or started solo.
@@ -1459,6 +1468,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     $('tools').hidden = !inG; $('btn-menu').hidden = !inG; if (!inG) closeMenu();
     if (!inG) { renderLanding(); renderBg(); renderChip(); return; }
     var gm = canControl(), w = canWrite();
+    cueGame();
     $('dial').dataset.phase = S.phase;
     $('loop-label').textContent = S.loop === 3 ? 'Loop 3 · final' : 'Loop ' + S.loop + ' of 3';
 
