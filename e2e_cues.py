@@ -57,7 +57,9 @@ try:
         gm.click('[data-act=start]'); gm.wait_for_timeout(600)
         before = gm.evaluate('window.__osc')
         # 10x speed: 59:30 minus two minutes of lead is already due, so the heads-up is up right away
-        gm.wait_for_function("() => /your private cue/.test(document.getElementById('cap-k').textContent)", timeout=5000)
+        gm.wait_for_function("() => document.getElementById('caption').classList.contains('cue')", timeout=5000)
+        check(gm.inner_text('#cap-k').upper().startswith('COMING UP IN') and 'ONLY YOU' in gm.evaluate("() => getComputedStyle(document.getElementById('cap-k'), '::after').content").upper(),
+              'heads-up is styled as a cue, with the only-you tag')
         check(NOTE in gm.inner_text('#cap-v'), 'heads-up names the cue')
         gm.wait_for_timeout(1500)
         check(gm.evaluate('window.__osc') == before, 'heads-up makes no sound')

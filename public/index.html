@@ -235,6 +235,12 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
 @media (prefers-reduced-motion:reduce){.caption{animation:none}}
 .cap-acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:9px}
 .cap-acts:empty{display:none}
+/* A private cue's heads-up: dark like the cue rows, with the same dashed amber edge and "only you" tag. */
+.caption.cue{background:var(--navy-deep);color:var(--paper);border:2px dashed var(--amber);box-shadow:5px 5px 0 var(--shadow)}
+.caption.cue b{display:flex;align-items:center;gap:10px;color:var(--amber)}
+.caption.cue b::after{content:"Only you";font:700 10px/1 var(--mono);letter-spacing:.1em;border:1px solid rgba(222,177,72,.6);padding:3px 5px}
+.caption.cue .toast-x{color:var(--paper)}
+.caption.cue .toast-x:hover{background:rgba(216,228,239,.12)}
 .caption{padding-right:44px}
 .toast-x{position:absolute;top:4px;right:4px;width:34px;height:34px;border:0;background:none;color:var(--ink);font-size:22px;line-height:1;cursor:pointer;border-radius:0}
 .toast-x:hover{background:rgba(10,48,87,.1)}
@@ -1356,7 +1362,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     if (!best) return null;
     var when = best.d > 0 ? 'Coming up in ' + fmt(best.d) : 'Right now';
     // No id, so no chime: a cue's heads-up is silent.
-    if (best.cue) return {key:'cue:' + best.m.id + ':' + S.loop, k:when + ' · your private cue', v:fmt(best.m.t) + ': ' + (best.m.note || 'unlabelled cue')};
+    if (best.cue) return {cue:true, key:'cue:' + best.m.id + ':' + S.loop, k:when, v:fmt(best.m.t) + ': ' + (best.m.note || 'unlabelled cue')};
     var src = best.m.loop ? 'from loop ' + best.m.loop : 'example';
     var what = fmt(best.m.t) + ': ' + (best.m.note || 'unlabelled timestamp');
     return {id:best.m.id, key:'soon:' + best.m.id + ':' + S.loop, k:when + ' · ' + src, v:what};
@@ -1435,6 +1441,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     if (cap.v !== last.capV) { $('cap-v').textContent = cap.v; last.capV = cap.v; }
     var acts = cap.acts || '';
     if (acts !== last.capActs) { $('cap-acts').innerHTML = acts; last.capActs = acts; }
+    if (!!cap.cue !== last.cue) { $('caption').classList.toggle('cue', !!cap.cue); last.cue = !!cap.cue; }
     if (!!cap.k !== last.toast) { document.body.classList.toggle('has-toast', !!cap.k); last.toast = !!cap.k; }
     if (cap.id !== undefined && !alerted[cap.id]) { alerted[cap.id] = true; sfx('soon'); }
   }
