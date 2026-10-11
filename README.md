@@ -42,7 +42,7 @@ First time:
 
 4. Open `https://timer.tinytabletops.com`. Caddy fetches the certificates on its own.
 
-Update: merging to `main` deploys automatically (see "Automatic deploys"). By hand: `cd ~/timer-server && git pull && docker compose up -d --build`.
+Update: merging to `main` deploys automatically (see "Automatic deploys"). By hand: `cd ~/timer-server && git pull && TIMER_IMAGE=timer-server-timer docker compose up -d --build`.
 Games survive the rebuild (they live in a Docker volume named after the folder, so keep the folder name).
 Logs: `docker compose logs -f timer`. Stop: `docker compose down` (add `-v` to also erase saved games and certificates).
 
@@ -51,14 +51,15 @@ Delete that block once the domain gets its own site.
 
 ## Automatic deploys
 Merging to `main` updates the live site. `.github/workflows/deploy.yml` builds `main` on GitHub's machines,
-pushes it to `ghcr.io/bschulzke/timer-server`, and sends `live <sha> <digest>` through the same locked-down
-SSH key and script as the previews. On the droplet the script checks the commit is on `main` and the image says
+pushes it to `ghcr.io/bschulzke/timer-server`, and sends `live <sha> <digest>` over its own locked-down SSH
+key (see below). On the droplet the script checks the commit is on `main` and the image says
 it was built from it, checks out that commit in `/root/timer-server` (so compose and Caddy changes come along),
-switches the `timer` service to that exact image, and waits until it answers. Saved games carry over.
+switches the `timer` service to that exact image, waits until it answers, and saves the image in `.env`
+so a plain `docker compose up -d` keeps it. Saved games carry over.
 Caddy is restarted only when the Caddyfile changed.
 
-To roll back, open the Actions tab, find the deploy for the commit you want, and re-run it. You can still
-deploy by hand with `git pull && docker compose up -d --build`.
+To roll back, open the Actions tab, find the deploy for the commit you want, and re-run it. To build on the
+droplet by hand instead: `git pull && TIMER_IMAGE=timer-server-timer docker compose up -d --build`.
 
 Merge is the only way in. The live update uses its own SSH key (`LIVE_SSH_KEY`), stored in a GitHub
 environment named `production` that only `main` may use, so a workflow edited on any other branch can't read it.
@@ -83,7 +84,8 @@ One-time setup (droplet, as root), after the preview setup below:
 On GitHub: Settings → Environments → New environment `production`; under Deployment branches and tags choose
 "Selected branches and tags" and add `main`; add the environment secret `LIVE_SSH_KEY` (contents of
 `/root/live-key`), then `rm /root/live-key /root/live-key.pub`. Protect `main` under Settings → Rules →
-Rulesets (see the PR for the exact settings).
+Rulesets → New branch ruleset: target the default branch, no bypass list, and turn on "Require a pull
+request before merging" (0 approvals), "Block force pushes" and "Restrict deletions".
 
 ## PR previews
 Every pull request from a branch in this repo gets its own copy of the app at
@@ -112,7 +114,7 @@ One-time setup (droplet, as root):
     # (install lines and sudoers as in "Automatic deploys" above)
     ssh-keygen -t ed25519 -N "" -C github-preview -f /root/preview-key
     install -d -o deploy -m 700 /home/deploy/.ssh
-    echo "command=\"sudo -n /usr/local/bin/timer-preview\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty $(cat /root/preview-key.pub)" > /home/deploy/.ssh/authorized_keys
+    echo "command=\"sudo -n /usr/local/bin/timer-preview\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty $(cat /root/preview-key.pub)" >> /home/deploy/.ssh/authorized_keys
     chown deploy /home/deploy/.ssh/authorized_keys && chmod 600 /home/deploy/.ssh/authorized_keys
     docker compose up -d --build
 

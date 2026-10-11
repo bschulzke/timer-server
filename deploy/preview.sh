@@ -119,6 +119,11 @@ live)
     i=$((i + 1)); [ $i -lt 30 ] || fail "the new version didn't come up; re-run the previous deploy to roll back"
     sleep 1
   done
+  # Remember this image in .env, so a plain `docker compose up -d` later keeps this version
+  # instead of falling back to an old local build.
+  touch .env
+  { grep -v '^TIMER_IMAGE=' .env || true; echo "TIMER_IMAGE=$IMAGE"; } > .env.new
+  chmod 600 .env.new && mv .env.new .env
   docker image prune -af --filter label=timer-live=1 >/dev/null 2>&1 || true
   echo "live: $(short "$SHA")"
   ;;
