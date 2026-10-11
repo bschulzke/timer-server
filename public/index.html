@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0A3057">
 <title>Shenan-Again Loop Timer</title>
 <meta name="shenan-ws" content="">
@@ -53,6 +53,8 @@
   --bg-strength:.4;
 }
 html,body{height:100%}
+/* No zooming on phones: no double-tap zoom, and quick taps on buttons aren't delayed. */
+html{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{
   background:
     linear-gradient(var(--line-faint) 1px,transparent 1px) 0 0/32px 32px,
@@ -266,6 +268,20 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
 .mark .x:hover{color:var(--alarm)}
 .mark.passed{opacity:.45}
 .mark.soon{background:rgba(222,177,72,.16)}
+/* Luck Dice counter: 20 dice above the timestamps, with − and + beside the count. */
+.luck{padding:12px 14px;border-bottom:1px solid var(--line-dim);display:grid;gap:10px}
+.luck-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.luck-count{display:flex;align-items:center;gap:10px}
+.luck-count span{font:400 12px/1 var(--mono);color:var(--line);min-width:58px;text-align:center;white-space:nowrap}
+.luck-count b{font:400 20px/1 var(--display);color:var(--amber);margin-right:2px}
+.luck-step{width:40px;height:40px;padding:0;border:1.5px solid var(--amber);border-radius:4px;background:rgba(222,177,72,.08);color:var(--amber);font:400 24px/1 var(--display);cursor:pointer;display:grid;place-items:center}
+.luck-step:active:not(:disabled){background:var(--amber);color:var(--navy)}
+.luck-step:disabled{border-color:var(--line-dim);color:rgba(166,199,242,.28);background:none;cursor:default}
+.dice{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px;max-width:440px}
+.die{aspect-ratio:1;min-width:0;border:1.5px solid var(--amber);border-radius:4px;background:rgba(222,177,72,.12);color:var(--amber);transition:background .15s,color .15s,border-color .15s}
+.die svg{display:block;width:100%;height:100%}
+.die.off{border-color:var(--line-dim);background:none;color:rgba(166,199,242,.28)}
+.luck .hint{font-size:12.5px;margin:0}
 /* Secret GM cues: only on the hosting device, never synced. */
 #panel-scen{width:min(480px,calc(100% - 32px))}
 .scen-list{display:grid;gap:6px}
@@ -390,6 +406,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     </div>
 
     <aside class="log" aria-label="Timestamps">
+      <section class="luck" id="luck" aria-label="Luck Dice" hidden></section>
       <header><h2>Timestamps</h2><span id="mark-count"></span></header>
       <ul class="marks" id="marks"></ul>
       <p class="empty" id="empty">Nothing marked yet. When something happens that the crew can use next loop, mark it.</p>
@@ -458,10 +475,15 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   var TEST = /[?&]test\b/.test(location.search);   // ?test in the address shows the clock-speed setting
   var SKEW = 0;   // add to Date.now() to get server time; set by the self-hosted transport
   function nowMs(){ return Date.now() + SKEW; }
+  // iPhones allow pinch zoom whatever the page says, so stop the gesture itself.
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(function(t){
+    document.addEventListener(t, function(e){ e.preventDefault(); }, {passive: false});
+  });
+  document.addEventListener('touchmove', function(e){ if (e.touches.length > 1) e.preventDefault(); }, {passive: false});
   var HOUR = 3600, KEY = 'shenan-timer-v1', C = 2 * Math.PI * 176, GRACE = 30000;
   var SHARE_URL = 'https://claude.ai/artifact/Ezgp29R9uCECGqWPBxJXAZ';
   var PHASES = ['ready', 'running', 'paused', 'caught', 'won'];
-  var GAME_KEYS = ['loop', 'phase', 'remaining', 'deadline', 'speed', 'won', 'bg', 'hostId', 'origHost', 'rev', 'dj', 'gid'];
+  var GAME_KEYS = ['loop', 'phase', 'remaining', 'deadline', 'speed', 'won', 'bg', 'hostId', 'origHost', 'rev', 'dj', 'gid', 'luck', 'dice'];
   var $ = function(id){ return document.getElementById(id); };
   var BGS = [
     {id:'grid',   name:'Blank sheet'},
@@ -485,7 +507,15 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
       readGame: function(code){
         return db.doc('games/' + code).get().then(function(s){ return s.exists ? s.data() : null; });
       },
-      writeGame: function(code, game){ return db.doc('games/' + code).set(game); },
+      // Luck Dice change only through luck(), so keep the stored count unless this is a new loop or game.
+      writeGame: function(code, game){
+        var ref = db.doc('games/' + code);
+        return ref.get().then(function(s){
+          var cur = s.exists ? s.data() : null;
+          var g = Object.assign({}, game, {dice: cur && cur.loop === game.loop && cur.gid === game.gid && typeof cur.dice === 'number' ? cur.dice : 20});
+          return ref.set(g);
+        });
+      },
       // cb(game or null, provisional). provisional = not yet confirmed by the server.
       watchGame: function(code, cb, fail){
         return db.doc('games/' + code).onSnapshot(function(s){
@@ -503,6 +533,15 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
       setDj: function(code, me){
         var ref = db.doc('games/' + code);
         return ref.get().then(function(s){ if (s.exists) return ref.set(Object.assign({}, s.data(), {dj: me})); });
+      },
+      // Spend (delta < 0) or give back (delta > 0) Luck Dice.
+      luck: function(code, delta){
+        var ref = db.doc('games/' + code);
+        return ref.get().then(function(s){
+          if (!s.exists) return;
+          var g = s.data(), d = Math.min(20, Math.max(0, (typeof g.dice === 'number' ? g.dice : 20) + delta));
+          return ref.set(Object.assign({}, g, {dice: d}));
+        });
       },
       // Who has this game open right now. cb(list of device ids, or null when this view can't tell).
       // Resolves {leave()} or null when presence isn't available.
@@ -598,6 +637,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
       writeMark: function(code, m){ return send({op:'wmark', code:code, id:m.id, mark:{t:m.t, loop:m.loop, note:m.note}}); },
       deleteMark: function(code, id){ return send({op:'dmark', code:code, id:id}); },
       setDj: function(code){ return send({op:'dj', code:code}); },
+      luck: function(code, delta){ return send({op:'luck', code:code, delta:delta}); },
       presence: function(code, me, cb){
         joined[code] = true; add(peerCbs, code, cb);
         return send({op:'join', code:code}).then(function(){
@@ -616,7 +656,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   function clampInt(v, lo, hi, d){ v = Math.round(+v); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; }
   function fresh(){
     return {loop:1, phase:'ready', remaining:HOUR*1000, deadline:null, speed:1, won:null, bg:'vault',
-            hostId:null, origHost:null, rev:0, dj:null, gid:rid(), marks:[]};   // gid: new for every new game
+            hostId:null, origHost:null, rev:0, dj:null, gid:rid(), luck:false, dice:20, marks:[]};   // gid: new for every new game
   }
   // Everything read from storage or from other devices goes through these two.
   function cleanGame(g){
@@ -634,6 +674,8 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     o.rev = typeof g.rev === 'number' && isFinite(g.rev) ? g.rev : 0;
     o.dj = typeof g.dj === 'string' ? g.dj.slice(0, 40) : null;
     o.gid = typeof g.gid === 'string' ? g.gid.slice(0, 40) : null;
+    o.luck = g.luck === true;
+    o.dice = clampInt(g.dice, 0, 20, 20);
     return o;
   }
   function cleanMark(m){
@@ -664,7 +706,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   // The hour ran out while the page was closed.
   function settleExpired(){
     if (S.phase !== 'running' || remainingMs() > 0) return;
-    if (S.loop < 3) { S.loop += 1; S.phase = 'ready'; S.remaining = HOUR * 1000; }
+    if (S.loop < 3) { S.loop += 1; S.phase = 'ready'; S.remaining = HOUR * 1000; S.dice = 20; }
     else { S.phase = 'caught'; S.remaining = 0; }
     S.deadline = null; saveLocal();
   }
@@ -899,6 +941,8 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     var next = cleanGame(g);
     // The music device changes without a new rev, so always take it from the latest copy.
     if (net.synced && next.dj !== S.dj) { S.dj = next.dj; renderSound(); }
+    // Luck Dice are spent without a new rev too.
+    if (net.synced) luckFromServer(next.dice); else LD.srv = next.dice;
     if (net.synced && next.rev < S.rev) return;                                   // an older write arriving late
     if (net.synced && next.rev === S.rev && next.hostId === S.hostId && S.hostId === P.device) {   // our own echo
       if (net.status !== 'live') { net.status = 'live'; render(); }                                   // ...which also means the connection is back
@@ -1358,7 +1402,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     confirming = null; alerted = {};
     if (S.loop < 3) {
       flash(); sfx('reset');
-      S.loop += 1; S.phase = 'ready'; S.remaining = HOUR * 1000; S.deadline = null;
+      S.loop += 1; S.phase = 'ready'; S.remaining = HOUR * 1000; S.deadline = null; S.dice = 20;
     } else {
       S.phase = 'caught'; S.remaining = 0; S.deadline = null; sfx('caught');
     }
@@ -1372,7 +1416,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   function newGame(){
     if (!canControl()) return;
     var old = S.marks.slice();
-    S = Object.assign(fresh(), {speed:S.speed, bg:S.bg, hostId:S.hostId, origHost:S.origHost, rev:S.rev});
+    S = Object.assign(fresh(), {speed:S.speed, bg:S.bg, hostId:S.hostId, origHost:S.origHost, rev:S.rev, luck:S.luck});
     confirming = null; alerted = {};
     if (net.code) old.forEach(function(m){ removeMarkQuiet(m.id); });
     commit(); render();
@@ -1548,7 +1592,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     var inG = inGame();
     $('landing').hidden = inG; $('sheet').hidden = !inG; $('titleblock').hidden = !inG; $('dock').hidden = !inG;
     $('tools').hidden = !inG; $('btn-menu').hidden = !inG; if (!inG) closeMenu();
-    if (!inG) { renderLanding(); renderBg(); renderChip(); return; }
+    if (!inG) { renderLuck(); renderLanding(); renderBg(); renderChip(); return; }
     var gm = canControl(), w = canWrite();
     cueGame();
     $('dial').dataset.phase = S.phase;
@@ -1614,12 +1658,73 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     }).join('');
 
     renderSound();
+    renderLuck();
 
     $('bg-strength').value = P.strength;
     renderBg(); renderChip(); renderShare();
     last = {offer: takeoverOffered()};
     paint();
   }
+
+  /* ================= Luck Dice ================= */
+  // Anyone can tap − to spend a die or + to put one back. Each tap shows at once and sends its own
+  // +1 or −1, so quick taps and taps from several players all add up on the server.
+  // pend = taps not yet answered; srv = the last count the server sent.
+  var LD = {pend:0, srv:null};
+  // Each die always shows the same face, just for looks, like a handful of dice already rolled.
+  var DIE_FACES = [3, 5, 1, 6, 2, 4, 4, 2, 6, 1, 5, 3, 2, 6, 3, 5, 1, 4, 6, 2];
+  var PIPS = {1:['5,5'], 2:['3,3','7,7'], 3:['3,3','5,5','7,7'], 4:['3,3','7,3','3,7','7,7'],
+              5:['3,3','7,3','5,5','3,7','7,7'], 6:['3,3','7,3','3,5','7,5','3,7','7,7']};
+  function dieFace(i){
+    return '<svg viewBox="0 0 10 10" aria-hidden="true">' + PIPS[DIE_FACES[i]].map(function(c){
+      var xy = c.split(','); return '<circle cx="' + xy[0] + '" cy="' + xy[1] + '" r=".95" fill="currentColor"/>';
+    }).join('') + '</svg>';
+  }
+  function luckOn(){ return inGame() && !!S.luck; }
+  // A count from the server. While our own taps are still on their way it would be out of date, so wait.
+  function luckFromServer(d){
+    LD.srv = d;
+    if (!LD.pend && d !== S.dice) { S.dice = d; renderLuck(); }
+  }
+  function renderLuck(){
+    var box = $('luck'), on = luckOn();
+    box.hidden = !on;
+    if (!on) { cache.luck = ''; box.innerHTML = ''; return; }
+    var n = S.dice, w = canWrite();
+    var d = '';
+    for (var i = 0; i < 20; i++) d += '<span class="die' + (i >= n ? ' off' : '') + '">' + dieFace(i) + '</span>';
+    var step = function(act, sym, label, ok){
+      return w ? '<button type="button" class="luck-step" data-luck="' + act + '" aria-label="' + label + '"' + (ok ? '' : ' disabled') + '>' + sym + '</button>' : '';
+    };
+    var h = '<div class="luck-head"><h2>Luck Dice</h2><div class="luck-count">' +
+      step('spend', '−', 'Spend a Luck Die', n > 0) +
+      '<span role="status" aria-label="' + n + ' of 20 Luck Dice left"><b>' + n + '</b> / 20</span>' +
+      step('add', '+', 'Put a Luck Die back', n < 20) + '</div></div>' +
+      '<div class="dice" aria-hidden="true">' + d + '</div>' +
+      (w ? '' : '<p class="hint">This view can’t change the count.</p>');
+    if (h !== cache.luck) {
+      var fid = document.activeElement && box.contains(document.activeElement) ? document.activeElement.dataset.luck : null;
+      box.innerHTML = h; cache.luck = h;
+      if (fid) { var f = box.querySelector('[data-luck="' + fid + '"]:not(:disabled)') || box.querySelector('[data-luck]:not(:disabled)'); if (f) f.focus(); }
+    }
+  }
+  function luckChange(delta){
+    if (!luckOn() || !canWrite()) return;
+    var next = Math.min(20, Math.max(0, S.dice + delta));
+    if (next === S.dice) return;
+    S.dice = next;
+    if (!net.code) { saveLocal(); renderLuck(); return; }
+    LD.pend++; renderLuck();
+    net.t.luck(net.code, delta).then(function(){ LD.pend--; }, function(e){
+      LD.pend--; writeFailed(e);
+      if (!LD.pend && LD.srv != null) { S.dice = LD.srv; renderLuck(); }    // undo what didn't go through
+    });
+  }
+  $('luck').addEventListener('click', function(e){
+    var a = e.target.closest('[data-luck]'); if (!a || a.disabled) return;
+    if (a.dataset.luck === 'spend') luckChange(-1);
+    else if (a.dataset.luck === 'add') luckChange(1);
+  });
 
   function peerCount(){ var seen = {}; (net.peers || []).forEach(function(d){ seen[d] = 1; }); return Object.keys(seen).length; }
   function renderChip(){
@@ -1639,7 +1744,10 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   }
   // New game (for whoever runs the clock), leaving, and, with ?test, the clock speed.
   function gameActions(control, leaveLabel){
-    var h = '<div class="row game-acts">';
+    var h = '';
+    if (control) h += '<label class="tog" for="luck-on"><input type="checkbox" id="luck-on" data-luck-on' + (S.luck ? ' checked' : '') + '>' +
+      '<span>Luck Dice counter<small>Shows everyone how many Luck Dice are left. Tap − to spend them. Resets each loop. Leave it off to track with real dice.</small></span></label>';
+    h += '<div class="row game-acts">';
     if (control) h += '<button class="btn small" data-share="new">New game</button>';
     h += '<button class="btn small" data-share="leave">' + leaveLabel + '</button></div>';
     if (TEST && control) h += '<div class="row"><label for="speed">Clock speed</label><select id="speed" data-share-speed>' +
@@ -1915,6 +2023,10 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   PANELS.forEach(function(x){ $(x[0]).addEventListener('click', function(){ togglePanel(x[1]); }); });
 
   $('share-body').addEventListener('change', function(e){
+    if (e.target.matches('[data-luck-on]')) {
+      if (!canControl()) { e.target.checked = !!S.luck; return; }
+      S.luck = e.target.checked; commit(); render(); return;
+    }
     if (e.target.matches('[data-cue-on]')) { CU.on = e.target.checked && cueOwner(); saveCues(); render(); return; }
     if (!e.target.matches('[data-share-speed]')) return;
     if (!canControl()) { e.target.value = String(S.speed); return; }
