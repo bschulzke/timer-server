@@ -1,5 +1,9 @@
 services:
   timer:
+    # Auto-deploy saves TIMER_IMAGE in .env: the exact image GitHub built from main, so a plain
+    # `docker compose up -d` keeps it. To build locally instead, override it:
+    # `TIMER_IMAGE=timer-server-timer docker compose up -d --build`.
+    image: ${TIMER_IMAGE:-timer-server-timer}
     build: .
     restart: unless-stopped
     environment:
@@ -8,6 +12,14 @@ services:
       - timer-data:/data
     expose:
       - "3000"
+    # Locked down like the previews: read-only except saved games, no extra privileges.
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped

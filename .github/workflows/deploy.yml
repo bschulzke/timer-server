@@ -1,0 +1,74 @@
+# Updates the live site (timer.tinytabletops.com) whenever main changes, usually by merging a PR.
+#
+# Same design as the PR previews: the image is built here, on GitHub's machines, and pushed to
+# ghcr.io/bschulzke/timer-server. The droplet only pulls that exact image by digest, through the
+# locked-down deploy script, and switches the live site to it. Saved games carry over.
+# To roll back, re-run the deploy for an older commit from the Actions tab.
+#
+# The live key (LIVE_SSH_KEY) lives in the "production" environment, which only main may use, so a
+# workflow edited on some other branch can't read it. Its forced command on the droplet accepts only `live`.
+name: Deploy live site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-live
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/bschulzke/timer-server
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub's container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push the live image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          provenance: false
+          tags: |
+            ${{ env.IMAGE }}:main
+            ${{ env.IMAGE }}:main-${{ github.sha }}
+          labels: |
+            timer-live=1
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+
+      - name: Update the live site
+        env:
+          KEY: ${{ secrets.LIVE_SSH_KEY }}
+          HOST: ${{ secrets.PREVIEW_HOST }}
+          KNOWN: ${{ secrets.PREVIEW_KNOWN_HOSTS }}
+          SHA: ${{ github.sha }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
+          if [ -n "$KNOWN" ]; then printf '%s\n' "$KNOWN" > ~/.ssh/known_hosts
+          else ssh-keyscan -t ed25519 "$HOST" > ~/.ssh/known_hosts 2>/dev/null; fi
+          ssh -i ~/.ssh/deploy -o BatchMode=yes deploy@"$HOST" "live $SHA $DIGEST"
+          echo "### Live site updated to \`${SHA:0:7}\`" >> "$GITHUB_STEP_SUMMARY"
