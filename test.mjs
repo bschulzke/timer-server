@@ -53,6 +53,10 @@ ok((await p1.req({ op: 'dj', code: 'ABCD' })).ok, 'a player can take over the mu
 ok((await p1.req({ op: 'read', code: 'ABCD' })).data.dj === 'pl1', 'music device moved to the player');
 await gm.req({ op: 'write', code: 'ABCD', game: game({ phase: 'paused', rev: 3, dj: 'gm1' }) });
 ok((await p1.req({ op: 'read', code: 'ABCD' })).data.dj === 'pl1', 'a GM clock write does not move the music back');
+await gm.req({ op: 'write', code: 'ABCD', game: game({ phase: 'paused', rev: 4, gid: 'g2' }) });
+ok((await p1.req({ op: 'read', code: 'ABCD' })).data.gid === 'g2', 'the game id is kept');
+await gm.req({ op: 'write', code: 'ABCD', game: game({ phase: 'paused', rev: 5, gid: 'bad id!' }) });
+ok((await p1.req({ op: 'read', code: 'ABCD' })).data.gid === null, 'a malformed game id is dropped');
 
 gm.ws.close(); await wait(100);
 ok((await p1.req({ op: 'write', code: 'ABCD', game: game({ hostId: 'pl1', rev: 4 }) })).code === 'rejected', 'takeover still refused right after GM leaves');

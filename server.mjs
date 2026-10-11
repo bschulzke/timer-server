@@ -68,6 +68,7 @@ function cleanGame(g) {
     origHost: typeof g.origHost === 'string' && ID_RE.test(g.origHost) ? g.origHost : null,
     rev: int(g.rev, 0, 1e9, 0),
     dj: typeof g.dj === 'string' && ID_RE.test(g.dj) ? g.dj : null,
+    gid: typeof g.gid === 'string' && ID_RE.test(g.gid) ? g.gid : null,   // changes with every new game
   };
   return o;
 }

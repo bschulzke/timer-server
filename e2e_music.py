@@ -40,7 +40,7 @@ try:
         pl.click('#btn-menu'); pl.wait_for_timeout(200)
         items = [x.inner_text().strip() for x in pl.query_selector_all('#tools .btn') if x.is_visible()]
         print('  player menu:', items)
-        check(items[:2] == ['SHARE GAME', 'LEAVE GAME'] and 'NEW GAME' not in items, 'player menu: share and leave, no new game')
+        check(items[:2] == ['GAME SETTINGS', 'LEAVE GAME'] and 'NEW GAME' not in items, 'player menu: game settings and leave, no new game')
         pl.click('#menu-leave'); pl.wait_for_timeout(300)
         check(pl.query_selector('[data-act=leave-yes]') is not None, 'leaving asks to confirm')
         pl.click('[data-act=cancel]'); pl.wait_for_timeout(200)
@@ -56,7 +56,7 @@ try:
         gm.click('#btn-menu'); gm.wait_for_timeout(200)
         items = [x.inner_text().strip() for x in gm.query_selector_all('#tools .btn') if x.is_visible()]
         print('  GM menu:', items)
-        check(items[:3] == ['SHARE GAME', 'NEW GAME', 'LEAVE GAME'], 'GM menu: share, new game, leave')
+        check(items[:3] == ['GAME SETTINGS', 'NEW GAME', 'LEAVE GAME'], 'GM menu: game settings, new game, leave')
         gm.click('#btn-menu'); gm.wait_for_timeout(200)
         gm.click('[data-act=start]'); gm.wait_for_timeout(3000)
         m = M(gm); print('  gm running:', m)
