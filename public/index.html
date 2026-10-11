@@ -656,7 +656,8 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   function clampInt(v, lo, hi, d){ v = Math.round(+v); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; }
   function fresh(){
     return {loop:1, phase:'ready', remaining:HOUR*1000, deadline:null, speed:1, won:null, bg:'vault',
-            hostId:null, origHost:null, rev:0, dj:null, gid:rid(), luck:false, dice:20, marks:[]};   // gid: new for every new game
+            hostId:null, origHost:null, rev:0, dj:null, gid:rid(), luck:!!(P && P.luck), dice:20, marks:[]};   // gid: new for every new game
+    // luck: a new game starts with the Luck Dice counter the way this device last left it
   }
   // Everything read from storage or from other devices goes through these two.
   function cleanGame(g){
@@ -712,7 +713,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   }
   function saveLocal(){ if (net.code || P.mode !== 'solo') return; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
   function loadPrefs(){
-    var p = {music:true, vol:70, effect:true, chimes:null, strength:40, useCustom:false, code:null, mode:null};
+    var p = {music:true, vol:70, effect:true, chimes:null, strength:40, useCustom:false, code:null, mode:null, luck:false};
     try {
       var raw = localStorage.getItem(KEY + '-prefs');
       if (raw) Object.assign(p, JSON.parse(raw));
@@ -733,7 +734,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
     return p;
   }
   function savePrefs(){
-    try { localStorage.setItem(KEY + '-prefs', JSON.stringify({music:P.music, vol:P.vol, effect:P.effect, chimes:P.chimes, strength:P.strength, useCustom:P.useCustom, code:P.code, mode:P.mode})); } catch(e){}
+    try { localStorage.setItem(KEY + '-prefs', JSON.stringify({music:P.music, vol:P.vol, effect:P.effect, chimes:P.chimes, strength:P.strength, useCustom:P.useCustom, code:P.code, mode:P.mode, luck:!!P.luck})); } catch(e){}
   }
 
   function pad(n){ return (n < 10 ? '0' : '') + n; }
@@ -2025,7 +2026,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   $('share-body').addEventListener('change', function(e){
     if (e.target.matches('[data-luck-on]')) {
       if (!canControl()) { e.target.checked = !!S.luck; return; }
-      S.luck = e.target.checked; commit(); render(); return;
+      S.luck = e.target.checked; P.luck = S.luck; savePrefs(); commit(); render(); return;
     }
     if (e.target.matches('[data-cue-on]')) { CU.on = e.target.checked && cueOwner(); saveCues(); render(); return; }
     if (!e.target.matches('[data-share-speed]')) return;
