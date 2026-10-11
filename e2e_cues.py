@@ -29,7 +29,9 @@ try:
 
         gm.goto(URL + '?test'); gm.wait_for_selector('[data-land=host]:not([disabled])')
         gm.click('[data-land=host]'); gm.wait_for_timeout(1500)
-        tool(gm, '#btn-share'); gm.wait_for_timeout(300)
+        gm.click('#btn-menu'); gm.wait_for_timeout(150)
+        check(gm.inner_text('#btn-share').strip().upper() == 'GAME SETTINGS', 'phone menu calls the Game panel "Game settings"')
+        gm.click('#btn-share'); gm.wait_for_timeout(300)
         code = re.search(r'#([A-Z0-9]{4})', gm.inner_text('#panel-share')).group(1)
         check(gm.query_selector('#cue-on') is not None and not gm.is_checked('#cue-on'), 'host sees the cue switch, off by default')
         check('everyone will see your cues' in gm.inner_text('#panel-share'), 'switch comes with the TV warning')
