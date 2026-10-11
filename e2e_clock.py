@@ -23,6 +23,8 @@ try:
 
         fresh()
         check(pg.get_attribute('#mk-t', 'inputmode') == 'numeric', 'number pad keyboard')
+        # Safari stops typing at maxlength before the page can step in, and 00:03 is already 5 characters.
+        check(pg.get_attribute('#mk-t', 'maxlength') is None, 'no maxlength on the field (it blocks typing on iPhones)')
         pg.keyboard.type('3'); check(val() == '00:03', 'typing 3 shows 00:03')
         pg.keyboard.type('15'); check(val() == '03:15', 'then 15 shows 03:15')
         pg.keyboard.press('Backspace'); check(val() == '00:31', 'backspace takes the last digit off')
@@ -47,6 +49,11 @@ try:
         pg.fill('#mk-t', '14:00'); check(val() == '14:00', 'pasting a whole time works')
         save(); check(pg.inner_text('#marks .mark-t') == '14:00', 'edited time saves')
 
+        fresh(); pg.keyboard.type('3')
+        # If a browser skips the page's handling and types straight into the field, it still comes out right.
+        pg.evaluate("() => { const f = document.getElementById('mk-t'); f.value = f.value + '1'; f.dispatchEvent(new Event('input')); }")
+        check(val() == '00:31', 'fallback: a digit typed straight into the field still shifts in')
+        pg.click('#panel-mark .panel-x'); pg.wait_for_timeout(150)
         fresh(); save()
         check(pg.is_visible('#mk-err'), 'an empty time is refused')
         b.close()
