@@ -236,7 +236,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
 .cap-acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:9px}
 .cap-acts:empty{display:none}
 /* A private cue's heads-up: dark like the cue rows, with the same dashed amber edge and "only you" tag. */
-.caption.cue{background:var(--navy-deep);color:var(--paper);border:.5px dashed var(--amber);box-shadow:5px 5px 0 var(--shadow)}
+.caption.cue{background:var(--navy-deep);color:var(--paper);border:1px dashed var(--amber);box-shadow:5px 5px 0 var(--shadow)}
 .caption.cue b{display:flex;align-items:center;gap:10px;color:var(--amber)}
 .caption.cue b::after{content:"Only you";font:700 10px/1 var(--mono);letter-spacing:.1em;border:1px solid rgba(222,177,72,.6);padding:3px 5px}
 .caption.cue .toast-x{color:var(--paper)}
@@ -267,7 +267,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
 .mark.passed{opacity:.45}
 .mark.soon{background:rgba(222,177,72,.16)}
 /* Private GM cues: only on the hosting device, never synced. */
-.mark.cue .mark-open{border-left:.5px dashed var(--amber);padding-left:13.5px}
+.mark.cue .mark-open{border-left:1px dashed var(--amber);padding-left:13px}
 .mark.cue .mark-loop{color:var(--amber);border-color:rgba(222,177,72,.55)}
 .cues{display:grid;gap:10px;border-top:1px solid var(--line-dim);padding-top:14px}
 .share .tog input{width:20px;height:20px;padding:0}
