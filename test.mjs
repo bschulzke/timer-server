@@ -58,6 +58,22 @@ ok((await p1.req({ op: 'read', code: 'ABCD' })).data.gid === 'g2', 'the game id 
 await gm.req({ op: 'write', code: 'ABCD', game: game({ phase: 'paused', rev: 5, gid: 'bad id!' }) });
 ok((await p1.req({ op: 'read', code: 'ABCD' })).data.gid === null, 'a malformed game id is dropped');
 
+// Luck Dice
+const rd = async () => (await p1.req({ op: 'read', code: 'ABCD' })).data;
+ok((await p1.req({ op: 'luck', code: 'ABCD', delta: -3 })).code === 'failed_precondition', 'no spending while the counter is off');
+await gm.req({ op: 'write', code: 'ABCD', game: game({ phase: 'paused', rev: 6, luck: true }) });
+ok((await rd()).dice === 20, 'counter starts at 20');
+ok((await p1.req({ op: 'luck', code: 'ABCD', delta: -3 })).ok && (await rd()).dice === 17, 'a player spends 3');
+ok((await p1.req({ op: 'luck', code: 'ABCD', delta: 2 })).code === 'rejected', 'a player cannot give dice back');
+ok((await gm.req({ op: 'luck', code: 'ABCD', delta: 1 })).ok && (await rd()).dice === 18, 'the GM gives one back');
+await gm.req({ op: 'write', code: 'ABCD', game: game({ phase: 'running', deadline: Date.now() + 1e6, rev: 7, luck: true, dice: 20 }) });
+ok((await rd()).dice === 18, 'a clock write in the same loop keeps the count');
+await p1.req({ op: 'luck', code: 'ABCD', delta: -20 });
+ok((await rd()).dice === 0, 'the count never goes below 0');
+await gm.req({ op: 'write', code: 'ABCD', game: game({ loop: 2, phase: 'ready', rev: 8, luck: true, dice: 0 }) });
+ok((await rd()).dice === 20, 'a new loop starts again from 20');
+ok((await p1.req({ op: 'luck', code: 'ABCD', delta: 'x' })).code === 'invalid_argument', 'a bad amount is refused');
+
 gm.ws.close(); await wait(100);
 ok((await p1.req({ op: 'write', code: 'ABCD', game: game({ hostId: 'pl1', rev: 4 }) })).code === 'rejected', 'takeover still refused right after GM leaves');
 await wait(500);

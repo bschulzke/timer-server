@@ -31,6 +31,12 @@ see them. Starting a new game clears them. "Load a scenario" adds the timed even
 rulebook's scenarios (the list is `SCENARIOS` in `public/index.html`; keep it in step with the book).
 A GM who casts their screen to the TV should host from their phone and open the game on the TV.
 
+## Luck Dice counter
+Optional, off by default. The GM turns it on in the Game panel; then everyone sees the 20 Luck Dice above
+the timestamps. Tap the dice you rolled, Spend, and confirm. The GM can tap spent dice to bring them back.
+The count resets to 20 each loop and on New game. On the server the count changes only through the `luck`
+op (anyone may spend, only the GM may give back), so a clock write never undoes a spend.
+
 ## Run it on your computer
     npm install
     npm start            # http://localhost:3000
@@ -39,6 +45,7 @@ A GM who casts their screen to the TV should host from their phone and open the 
     python3 e2e_music.py # music: hand-off, rotation, final-minutes effect (about 2 minutes)
     python3 e2e_cues.py  # secret cues: host only, silent, never sent, scenario loading
     python3 e2e_clock.py # typing clock readings, microwave style
+    python3 e2e_luck.py  # Luck Dice counter: spend, give back, resets, solo
 
 ## Deploy to the droplet
 First time:

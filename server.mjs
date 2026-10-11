@@ -69,6 +69,8 @@ function cleanGame(g) {
     rev: int(g.rev, 0, 1e9, 0),
     dj: typeof g.dj === 'string' && ID_RE.test(g.dj) ? g.dj : null,
     gid: typeof g.gid === 'string' && ID_RE.test(g.gid) ? g.gid : null,   // changes with every new game
+    luck: g.luck === true,                                             // Luck Dice counter on (GM's choice)
+    dice: int(g.dice, 0, 20, 20),                                      // Luck Dice left this loop
   };
   return o;
 }
@@ -150,6 +152,8 @@ function mayWriteGame(code, device, next) {
     unwatch{code}
     join   {code}                     -> {ok}; adds this device to the game's presence list, pushed as {ev:'peers'}
     dj     {code}                     -> {ok}; makes this device the one that plays the music
+    luck   {code, delta}              -> {ok}; spends (delta < 0, anyone) or gives back (delta > 0, GM only)
+                                         Luck Dice, while the counter is on
 */
 function handle(ws, m) {
   const { op, rid } = m;
@@ -199,6 +203,9 @@ function handle(ws, m) {
       const cur = games.get(code);
       // The music device is set only through 'dj'; a clock write never moves it.
       next.dj = cur ? (cur.game.dj || cur.game.hostId) : next.hostId;
+      // Luck Dice change only through 'luck', so a clock write keeps the current count.
+      // A new loop or a new game starts again from 20.
+      next.dice = cur && cur.game.loop === next.loop && cur.game.gid === next.gid ? cur.game.dice : 20;
       if (cur) { cur.game = { ...next, updatedAt: Date.now() }; cur.touched = Date.now(); }
       else games.set(code, { game: { ...next, updatedAt: Date.now() }, marks: new Map(), touched: Date.now() });
       if (ws.device === next.hostId) hostSeen.set(code, Date.now());     // the GM just proved they are here
@@ -210,6 +217,18 @@ function handle(ws, m) {
       const g = games.get(code);
       if (!g) return bad('not_found');
       g.game = { ...g.game, dj: ws.device, updatedAt: Date.now() }; g.touched = Date.now(); saveSoon();
+      reply(ws, rid, { ok: true });
+      return broadcastGame(code, null);
+    }
+    case 'luck': {
+      const g = games.get(code);
+      if (!g) return bad('not_found');
+      const delta = Math.round(+m.delta);
+      if (!Number.isFinite(delta) || delta === 0 || Math.abs(delta) > 20) return bad();
+      if (!g.game.luck) return bad('failed_precondition');
+      if (delta > 0 && ws.device !== g.game.hostId) return bad('rejected');     // only the GM gives dice back
+      g.game = { ...g.game, dice: Math.min(20, Math.max(0, g.game.dice + delta)), updatedAt: Date.now() };
+      g.touched = Date.now(); saveSoon();
       reply(ws, rid, { ok: true });
       return broadcastGame(code, null);
     }
