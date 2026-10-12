@@ -74,6 +74,15 @@ try:
         check(not pl.is_visible('#luck') and not gm.is_visible('#luck'), 'turning it off hides it for everyone')
         gm.click('#panel-share .panel-x')
 
+        def rehost():
+            gm.click('#btn-menu'); gm.click('#menu-leave'); gm.wait_for_timeout(200); gm.click('[data-act=leave-yes]'); gm.wait_for_timeout(400)
+            gm.click('[data-land=host]'); gm.wait_for_timeout(1500)
+            tool(gm, '#btn-share'); gm.wait_for_timeout(200)
+            on = gm.is_checked('#luck-on'); gm.click('#panel-share .panel-x'); return on
+        check(not rehost(), 'left with the counter off: the next hosted game starts with it off')
+        tool(gm, '#btn-share'); gm.wait_for_timeout(200); gm.check('#luck-on'); gm.wait_for_timeout(300); gm.click('#panel-share .panel-x')
+        check(rehost() and gm.is_visible('#luck') and count(gm) == 20, 'left with it on: the next hosted game starts with it on, at 20')
+
         solo = b.new_context(**dev).new_page()
         solo.goto(URL); solo.wait_for_selector('[data-land=solo]'); solo.click('[data-land=solo]'); solo.wait_for_timeout(400)
         tool(solo, '#btn-share'); solo.wait_for_timeout(200); solo.check('#luck-on'); solo.click('#panel-share .panel-x')
