@@ -725,13 +725,76 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
         }
       }
     } catch(e){}
-    // Device identity is per tab, so two tabs in one browser count as two devices.
-    p.device = null;
-    try {
-      p.device = sessionStorage.getItem(KEY + '-device');
-      if (!p.device) { p.device = rid(); sessionStorage.setItem(KEY + '-device', p.device); }
-    } catch(e){ p.device = p.device || rid(); }
+    p.device = DEVICE || rid();
     return p;
+  }
+
+  /* ================= which device this tab is ================= */
+  // Two tabs open at once are two devices, so a tab cast to the TV never shows the GM's secret cues.
+  // But closing a tab and coming back should keep you who you were (the GM, say). So each tab holds a
+  // browser lock on its ID while it's open, and a new tab reuses a past ID only if no open tab holds it.
+  // The browser drops a tab's locks when it closes, even if it crashes.
+  var DEVICE = null, DKEY = KEY + '-device', DLIST = KEY + '-devices', DEV_RE = /^[A-Za-z0-9_-]{6,40}$/;
+  function deviceBook(){
+    var b = {ids:[], gm:{}};
+    try {
+      var raw = JSON.parse(localStorage.getItem(DLIST) || 'null');
+      if (raw && Array.isArray(raw.ids)) b.ids = raw.ids.filter(function(d){ return typeof d === 'string' && DEV_RE.test(d); }).slice(0, 6);
+      if (raw && raw.gm && typeof raw.gm === 'object') Object.keys(raw.gm).forEach(function(c){
+        if (/^[A-Z0-9]{4}$/.test(c) && typeof raw.gm[c] === 'string' && DEV_RE.test(raw.gm[c])) b.gm[c] = raw.gm[c];
+      });
+    } catch(e){}
+    return b;
+  }
+  function saveDeviceBook(b){ try { localStorage.setItem(DLIST, JSON.stringify(b)); } catch(e){} }
+  // Remember which device was GM of which game, so coming back to that game tries that ID first.
+  function noteGM(){
+    if (!net.code || !S || S.hostId !== P.device || noteGM.last === net.code + P.device) return;
+    noteGM.last = net.code + P.device;
+    var b = deviceBook(), codes = Object.keys(b.gm).filter(function(c){ return c !== net.code; }).slice(-5);
+    var gm = {}; codes.forEach(function(c){ gm[c] = b.gm[c]; }); gm[net.code] = P.device; b.gm = gm;
+    saveDeviceBook(b);
+  }
+  function claimDevice(done){
+    var finished = false;
+    function finish(d){
+      if (finished) return; finished = true;
+      var b = deviceBook();
+      b.ids = [d].concat(b.ids.filter(function(x){ return x !== d; })).slice(0, 6);
+      saveDeviceBook(b);
+      try { sessionStorage.setItem(DKEY, d); } catch(e){}
+      DEVICE = d; done();
+    }
+    var locks = null;
+    try { if (navigator.locks && navigator.locks.request) locks = navigator.locks; } catch(e){}
+    function hold(d){
+      if (!locks) return;
+      try { locks.request(KEY + '-dev-' + d, function(){ return new Promise(function(){}); }).catch(function(){}); } catch(e){}
+    }
+    var mine = null;
+    try { mine = sessionStorage.getItem(DKEY); } catch(e){}
+    if (mine && DEV_RE.test(mine)) { hold(mine); return finish(mine); }        // a reload keeps its ID
+    if (!locks) return finish(rid());                                        // no locks: a new ID, as before
+    // Try the GM of the game we're going back to first, then other recent IDs, newest first.
+    var b = deviceBook(), code = hashCode();
+    if (!code) { try { code = (JSON.parse(localStorage.getItem(KEY + '-prefs') || '{}') || {}).code; } catch(e){} }
+    var order = [];
+    if (code && b.gm[code]) order.push(b.gm[code]);
+    b.ids.forEach(function(d){ if (order.indexOf(d) < 0) order.push(d); });
+    setTimeout(function(){ if (!finished) { var n = rid(); hold(n); finish(n); } }, 1500);   // never wait long
+    var i = 0;
+    (function next(){
+      if (finished) return;
+      if (i >= order.length) { var n = rid(); hold(n); return finish(n); }
+      var d = order[i++];
+      try {
+        locks.request(KEY + '-dev-' + d, {ifAvailable: true}, function(lock){
+          if (!lock || finished) { next(); return; }
+          finish(d);
+          return new Promise(function(){});                                  // keep it while this tab is open
+        }).catch(function(){ next(); });
+      } catch(e){ next(); }
+    })();
   }
   function savePrefs(){
     try { localStorage.setItem(KEY + '-prefs', JSON.stringify({music:P.music, vol:P.vol, effect:P.effect, chimes:P.chimes, strength:P.strength, useCustom:P.useCustom, code:P.code, mode:P.mode, luck:!!P.luck})); } catch(e){}
@@ -1575,6 +1638,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   /* ================= structural render ================= */
   // Redraws everything, then puts the cursor back if someone was typing.
   function render(){
+    noteGM();
     var ae = document.activeElement;
     var keep = ae && ae.id && /^(note-|time-|join-code$)/.test(ae.id)
       ? {id:ae.id, v:ae.value, a:ae.selectionStart, b:ae.selectionEnd} : null;
@@ -2124,6 +2188,7 @@ html:has(#scrim:not([hidden])),html:has(#scrim:not([hidden])) body{overflow:hidd
   }
   var hot = window.claude && window.claude.hot;
   try { if (hot && hot.snapshot) hot.snapshot(function(){ return !P || net.code || P.mode !== 'solo' ? null : S; }); } catch(e){}
-  if (hot && hot.ready) hot.ready(boot); else boot(hot && hot.data);
+  function start(data){ claimDevice(function(){ boot(data); }); }
+  if (hot && hot.ready) hot.ready(start); else start(hot && hot.data);
 })();
 </script>

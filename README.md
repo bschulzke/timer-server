@@ -9,6 +9,10 @@ doesn't lose them. Devices connect over one WebSocket (`/ws`). Idle games are de
 - Timestamps are limited to 120 characters and 500 per game. Every field from the page is checked.
 - Each connection is rate limited. Messages over 8 KB are refused.
 - Devices sync to the server's clock, so a phone with a wrong clock still counts down correctly.
+- Each browser tab is its own device, so two tabs open at once never share the GM role or secret cues.
+  Closing a tab and coming back keeps its identity: a new tab reuses a past ID only if no open tab holds
+  it (each tab holds a browser lock on its ID, released when it closes), trying the returning game's GM
+  first. Browsers without locks (Safari before iOS 15.4) get a new ID per tab, as before.
 
 ## Music
 Music plays on one device only: the GM's by default, or whichever device last tapped "Play music here"
@@ -48,6 +52,7 @@ from several players at once all count, and a clock write never undoes a spend.
     python3 e2e_cues.py  # secret cues: host only, silent, never sent, scenario loading
     python3 e2e_clock.py # typing clock readings, microwave style
     python3 e2e_luck.py  # Luck Dice counter: − and +, sync, resets, solo
+    python3 e2e_device.py # closing the GM's tab and coming back keeps you the GM
 
 ## Deploy to the droplet
 First time:
