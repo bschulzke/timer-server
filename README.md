@@ -56,7 +56,7 @@ from several players at once all count, and a clock write never undoes a spend.
 
 ## Deploy to the droplet
 First time:
-1. DNS: `A` records for `timer`, `@` and `www` on tinytabletops.com, all pointing at the droplet's IP.
+1. DNS: `A` records for `timer`, `media`, `@` and `www` on tinytabletops.com, all pointing at the droplet's IP.
 2. Nothing else on the droplet may use ports 80 and 443 (`docker ps`, PORTS column).
 3. On the droplet:
 
@@ -73,6 +73,12 @@ Logs: `docker compose logs -f timer`. Stop: `docker compose down` (add `-v` to a
 
 The Caddyfile also redirects tinytabletops.com and www to the timer, as a temporary (302) redirect.
 Delete that block once the domain gets its own site.
+
+## Social media images
+Caddy also serves the `media/` folder at `https://media.tinytabletops.com/<file>`. These are the game's art,
+resized for Instagram and Bluesky (1080 px wide), and Metricool fetches post images from these URLs.
+`media/index.json` lists every file. To add an image, put it in `media/`, add it to the index, and merge;
+the deploy brings it along. The timer image doesn't include this folder (see `.dockerignore`).
 
 ## Automatic deploys
 Merging to `main` updates the live site. `.github/workflows/deploy.yml` builds `main` on GitHub's machines,
