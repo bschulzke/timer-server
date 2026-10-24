@@ -448,7 +448,127 @@
     1350
    ],
    "ai": false
+  },
+  {
+   "file": "photo_table_ipad_circus_map.jpg",
+   "size": [
+    1080,
+    1350
+   ],
+   "ai": false,
+   "kind": "photo",
+   "description": "Overhead photo of a wooden table: an iPad showing the hand-drawn circus grounds map, scattered red and teal six-sided dice, a bowl of teal dice, a marker, and handwritten character cards."
+  },
+  {
+   "file": "photo_table_timer_final_loop.jpg",
+   "size": [
+    1080,
+    810
+   ],
+   "ai": false,
+   "kind": "photo",
+   "description": "A kitchen table set up for a game: a laptop running the Shenan-Again Loop Timer showing loop 3 (final) with 00:38 left, an iPad mirroring the timer, a bowl of dice, scattered dice, and handwritten character cards."
+  },
+  {
+   "file": "photo_cat_swiping_dice.jpg",
+   "size": [
+    1080,
+    810
+   ],
+   "ai": false,
+   "kind": "photo",
+   "description": "A tabby cat sitting on a chair reaches a paw across the game table to swat a red die. A laptop shows the Loop Timer at 29:15 in loop 2, with character cards and dice on the table."
+  },
+  {
+   "file": "photo_cat_watching_table.jpg",
+   "size": [
+    1080,
+    810
+   ],
+   "ai": false,
+   "kind": "photo",
+   "description": "A tabby cat sits on a chair and eyes the game table: laptop running the Loop Timer at 29:51, an iPad, a bowl, dice, a marker, and handwritten character cards."
+  },
+  {
+   "file": "photo_cat_looking_at_camera.jpg",
+   "size": [
+    1080,
+    810
+   ],
+   "ai": false,
+   "kind": "photo",
+   "description": "A tabby cat sitting on a chair at the game table looks straight at the camera. The laptop shows the Loop Timer at 31:51, with dice and character cards on the table."
+  },
+  {
+   "file": "photo_cat_reaching_timer_warning.jpg",
+   "size": [
+    1080,
+    810
+   ],
+   "ai": false,
+   "kind": "photo",
+   "description": "A tabby cat stretches both paws onto the game table toward the dice. On the laptop, the Loop Timer at 33:33 shows a pop-up warning that a marked moment from the last loop, \"Guard leaves their post\", is coming up."
+  },
+  {
+   "file": "photo_cat_reaching_dice.jpg",
+   "size": [
+    1080,
+    810
+   ],
+   "ai": false,
+   "kind": "photo",
+   "description": "A tabby cat climbs up with its paws on the edge of the game table, reaching for the dice. The laptop shows the Loop Timer at 34:27."
+  },
+  {
+   "file": "photo_dice_closeup.jpg",
+   "size": [
+    1080,
+    1350
+   ],
+   "ai": false,
+   "kind": "photo",
+   "description": "Close-up of seven translucent six-sided dice on a dark table: two teal and five red, showing sixes, fives and fours."
+  },
+  {
+   "file": "photo_card_snarky_con.jpg",
+   "size": [
+    1080,
+    1350
+   ],
+   "ai": false,
+   "kind": "photo",
+   "description": "A handwritten index card on a dark table that reads \"Snarky Con with a Gambling Problem\"."
+  },
+  {
+   "file": "photo_card_sleepy_hacker.jpg",
+   "size": [
+    1080,
+    1350
+   ],
+   "ai": false,
+   "kind": "photo",
+   "description": "A handwritten index card on a dark table that reads \"Sleepy Hacker with an authority complex\"."
+  },
+  {
+   "file": "photo_card_quiet_muscle.jpg",
+   "size": [
+    1080,
+    1350
+   ],
+   "ai": false,
+   "kind": "photo",
+   "description": "A handwritten index card on a dark table that reads \"Quiet Muscle with Back Pain\"."
+  },
+  {
+   "file": "photo_card_confident_burglar.jpg",
+   "size": [
+    1080,
+    1350
+   ],
+   "ai": false,
+   "kind": "photo",
+   "description": "A handwritten index card on a dark table that reads \"Confident Burglar with nothing to lose\"."
   }
  ],
- "notes": "ai: true means AI-generated art (Instagram posts using it must set isAiGenerated). ai: false means made by people. The scenario maps (map_*) were drawn by people."
+ "notes": "ai: true means AI-generated art (Instagram posts using it must set isAiGenerated). ai: false means made by people: the scenario maps (map_*) were drawn by people, and photo_* files are real photos with a description of what they show."
 }
