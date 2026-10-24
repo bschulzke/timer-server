@@ -12,6 +12,13 @@
 	reverse_proxy timer:3000
 }
 
+# Post-ready images for social media. Metricool fetches post images from here.
+# The files live in media/ in this repo; media/index.json lists them. No directory listing.
+media.tinytabletops.com {
+	root * /srv/media
+	file_server
+}
+
 # For now the bare domain sends visitors to the timer. 302 (temporary) so browsers don't remember it
 # once tinytabletops.com gets its own site. Delete this block then.
 tinytabletops.com, www.tinytabletops.com {

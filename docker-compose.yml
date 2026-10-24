@@ -31,6 +31,7 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - /srv/previews/allowed:/previews/allowed:ro   # active PR previews (see deploy/preview.sh)
+      - ./media:/srv/media:ro                        # social media images, served at media.tinytabletops.com
       - caddy-data:/data
       - caddy-config:/config
     networks:
