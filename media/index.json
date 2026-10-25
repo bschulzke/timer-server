@@ -7,7 +7,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "art_narrator_poses"
   },
   {
    "file": "hacker_typing_standing_black.jpg",
@@ -15,7 +16,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "hacker_typing_standing_black"
   },
   {
    "file": "kick_walkie_talkie_black.jpg",
@@ -23,7 +25,8 @@
     1080,
     565
    ],
-   "ai": true
+   "ai": true,
+   "group": "kick_walkie_talkie_black"
   },
   {
    "file": "scene_caveman_iphone_black.jpg",
@@ -31,7 +34,8 @@
     1080,
     1030
    ],
-   "ai": true
+   "ai": true,
+   "group": "scene_caveman_iphone_black"
   },
   {
    "file": "scene_lab_disaster_blue.jpg",
@@ -39,7 +43,8 @@
     1080,
     667
    ],
-   "ai": true
+   "ai": true,
+   "group": "scene_lab_disaster_blue"
   },
   {
    "file": "crew_base_poses_blue.jpg",
@@ -47,7 +52,8 @@
     1080,
     565
    ],
-   "ai": true
+   "ai": true,
+   "group": "crew_base_poses_blue"
   },
   {
    "file": "gm_stop_hand_black.jpg",
@@ -55,7 +61,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "gm_stop_hand_black"
   },
   {
    "file": "map_circus_trailer_blue.jpg",
@@ -63,7 +70,8 @@
     1080,
     1350
    ],
-   "ai": false
+   "ai": false,
+   "group": "circus_map"
   },
   {
    "file": "map_circus_grounds_blue.jpg",
@@ -71,7 +79,8 @@
     1080,
     803
    ],
-   "ai": false
+   "ai": false,
+   "group": "circus_map"
   },
   {
    "file": "nar_blueprint_black.jpg",
@@ -79,7 +88,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "art_narrator_poses"
   },
   {
    "file": "npc_samantha_adelson_black.jpg",
@@ -87,7 +97,8 @@
     1080,
     967
    ],
-   "ai": true
+   "ai": true,
+   "group": "npc_samantha_adelson_black"
   },
   {
    "file": "city_street_blue.jpg",
@@ -95,7 +106,8 @@
     1080,
     756
    ],
-   "ai": true
+   "ai": true,
+   "group": "city_street_blue"
   },
   {
    "file": "npc_jaren_yoshiko_black.jpg",
@@ -103,7 +115,8 @@
     1080,
     967
    ],
-   "ai": true
+   "ai": true,
+   "group": "npc_jaren_yoshiko_black"
   },
   {
    "file": "scene_crew_briefing_blue.jpg",
@@ -111,7 +124,8 @@
     1080,
     832
    ],
-   "ai": true
+   "ai": true,
+   "group": "scene_crew_briefing_blue"
   },
   {
    "file": "npc_jasper_beck_black.jpg",
@@ -119,7 +133,8 @@
     1080,
     967
    ],
-   "ai": true
+   "ai": true,
+   "group": "npc_jasper_beck_black"
   },
   {
    "file": "npc_lidia_volkova_black.jpg",
@@ -127,7 +142,8 @@
     1080,
     967
    ],
-   "ai": true
+   "ai": true,
+   "group": "npc_lidia_volkova_black"
   },
   {
    "file": "burglar_running_black.jpg",
@@ -135,7 +151,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "art_burglar"
   },
   {
    "file": "npc_eyolf_brun_black.jpg",
@@ -143,7 +160,8 @@
     1080,
     967
    ],
-   "ai": true
+   "ai": true,
+   "group": "npc_eyolf_brun_black"
   },
   {
    "file": "nar_arms_crossed_black.jpg",
@@ -151,7 +169,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "art_narrator_poses"
   },
   {
    "file": "npc_agnes_hawtrey_black.jpg",
@@ -159,7 +178,8 @@
     1080,
     967
    ],
-   "ai": true
+   "ai": true,
+   "group": "npc_agnes_hawtrey_black"
   },
   {
    "file": "npc_weston_rask_black.jpg",
@@ -167,7 +187,8 @@
     1080,
     967
    ],
-   "ai": true
+   "ai": true,
+   "group": "npc_weston_rask_black"
   },
   {
    "file": "npc_aaron_hughes_black.jpg",
@@ -175,7 +196,8 @@
     1080,
     967
    ],
-   "ai": true
+   "ai": true,
+   "group": "npc_aaron_hughes_black"
   },
   {
    "file": "npc_polina_smirnoff_black.jpg",
@@ -183,7 +205,8 @@
     1080,
     967
    ],
-   "ai": true
+   "ai": true,
+   "group": "npc_polina_smirnoff_black"
   },
   {
    "file": "scene_government_lab_blue.jpg",
@@ -191,7 +214,8 @@
     1080,
     783
    ],
-   "ai": true
+   "ai": true,
+   "group": "scene_government_lab_blue"
   },
   {
    "file": "nar_shrugging_black.jpg",
@@ -199,7 +223,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "art_narrator_poses"
   },
   {
    "file": "map_iss_blue.jpg",
@@ -207,7 +232,8 @@
     1080,
     840
    ],
-   "ai": false
+   "ai": false,
+   "group": "map_iss_blue"
   },
   {
    "file": "npc_bill_murdock_black.jpg",
@@ -215,7 +241,8 @@
     1080,
     967
    ],
-   "ai": true
+   "ai": true,
+   "group": "npc_bill_murdock_black"
   },
   {
    "file": "npc_jared_adelson_black.jpg",
@@ -223,7 +250,8 @@
     1080,
     967
    ],
-   "ai": true
+   "ai": true,
+   "group": "npc_jared_adelson_black"
   },
   {
    "file": "scene_crew_action_blue.jpg",
@@ -231,7 +259,8 @@
     1080,
     1063
    ],
-   "ai": true
+   "ai": true,
+   "group": "scene_crew_action_blue"
   },
   {
    "file": "npc_timothy_glenn_black.jpg",
@@ -239,7 +268,8 @@
     1080,
     967
    ],
-   "ai": true
+   "ai": true,
+   "group": "npc_timothy_glenn_black"
   },
   {
    "file": "npc_dave_brown_black.jpg",
@@ -247,7 +277,8 @@
     1080,
     967
    ],
-   "ai": true
+   "ai": true,
+   "group": "npc_dave_brown_black"
   },
   {
    "file": "nar_dice_black.jpg",
@@ -255,7 +286,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "art_narrator_poses"
   },
   {
    "file": "npc_susanne_lund_black.jpg",
@@ -263,7 +295,8 @@
     1080,
     967
    ],
-   "ai": true
+   "ai": true,
+   "group": "npc_susanne_lund_black"
   },
   {
    "file": "cover_art.jpg",
@@ -271,7 +304,8 @@
     1080,
     1080
    ],
-   "ai": true
+   "ai": true,
+   "group": "cover_art"
   },
   {
    "file": "nar_excited_black.jpg",
@@ -279,7 +313,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "art_narrator_poses"
   },
   {
    "file": "muscle_boost_black.jpg",
@@ -287,7 +322,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "art_muscle"
   },
   {
    "file": "nar_aside_black.jpg",
@@ -295,7 +331,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "art_narrator_poses"
   },
   {
    "file": "scene_time_loop_diagram_blue.jpg",
@@ -303,7 +340,8 @@
     1080,
     1080
    ],
-   "ai": true
+   "ai": true,
+   "group": "scene_time_loop_diagram_blue"
   },
   {
    "file": "map_yacht_middle_and_lower_decks_blue.jpg",
@@ -311,7 +349,8 @@
     1080,
     1350
    ],
-   "ai": false
+   "ai": false,
+   "group": "map_yacht"
   },
   {
    "file": "npc_hank_biser_black.jpg",
@@ -319,7 +358,8 @@
     1080,
     967
    ],
-   "ai": true
+   "ai": true,
+   "group": "npc_hank_biser_black"
   },
   {
    "file": "nar_stopwatch_black.jpg",
@@ -327,7 +367,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "art_narrator_poses"
   },
   {
    "file": "nar_holding_book_black.jpg",
@@ -335,7 +376,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "art_narrator_poses"
   },
   {
    "file": "con_confident_black.jpg",
@@ -343,7 +385,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "con_confident_black"
   },
   {
    "file": "scene_tabletop_blue.jpg",
@@ -351,7 +394,8 @@
     1080,
     720
    ],
-   "ai": true
+   "ai": true,
+   "group": "scene_tabletop_blue"
   },
   {
    "file": "map_yacht_sun_deck_blue.jpg",
@@ -359,7 +403,8 @@
     1080,
     1350
    ],
-   "ai": false
+   "ai": false,
+   "group": "map_yacht"
   },
   {
    "file": "nar_pointing_black.jpg",
@@ -367,7 +412,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "art_narrator_poses"
   },
   {
    "file": "burglar_caught_black.jpg",
@@ -375,7 +421,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "art_burglar"
   },
   {
    "file": "scene_heist_planning_blue.jpg",
@@ -383,7 +430,8 @@
     1080,
     1080
    ],
-   "ai": true
+   "ai": true,
+   "group": "scene_heist_planning_blue"
   },
   {
    "file": "nar_leaning_black.jpg",
@@ -391,7 +439,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "art_narrator_poses"
   },
   {
    "file": "muscle_grapple_black.jpg",
@@ -399,7 +448,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "art_muscle"
   },
   {
    "file": "npc_trisha_worthing_black.jpg",
@@ -407,7 +457,8 @@
     1080,
     968
    ],
-   "ai": true
+   "ai": true,
+   "group": "npc_trisha_worthing_black"
   },
   {
    "file": "nar_waving_black.jpg",
@@ -415,7 +466,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "art_narrator_poses"
   },
   {
    "file": "muscle_fighting_stance_black.jpg",
@@ -423,7 +475,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "art_muscle"
   },
   {
    "file": "npc_jean_friedman_black.jpg",
@@ -431,7 +484,8 @@
     1080,
     967
    ],
-   "ai": true
+   "ai": true,
+   "group": "npc_jean_friedman_black"
   },
   {
    "file": "gm_title_card_black.jpg",
@@ -439,7 +493,8 @@
     1080,
     1350
    ],
-   "ai": true
+   "ai": true,
+   "group": "gm_title_card_black"
   },
   {
    "file": "map_yacht_upper_deck_blue.jpg",
@@ -447,7 +502,8 @@
     1080,
     1350
    ],
-   "ai": false
+   "ai": false,
+   "group": "map_yacht"
   },
   {
    "file": "photo_table_ipad_circus_map.jpg",
@@ -457,7 +513,8 @@
    ],
    "ai": false,
    "kind": "photo",
-   "description": "Overhead photo of a wooden table: an iPad showing the hand-drawn circus grounds map, scattered red and teal six-sided dice, a bowl of teal dice, a marker, and handwritten character cards."
+   "description": "Overhead photo of a wooden table: an iPad showing the hand-drawn circus grounds map, scattered red and teal six-sided dice, a bowl of teal dice, a marker, and handwritten character cards.",
+   "group": "circus_map"
   },
   {
    "file": "photo_table_timer_final_loop.jpg",
@@ -467,7 +524,8 @@
    ],
    "ai": false,
    "kind": "photo",
-   "description": "A kitchen table set up for a game: a laptop running the Shenan-Again Loop Timer showing loop 3 (final) with 00:38 left, an iPad mirroring the timer, a bowl of dice, scattered dice, and handwritten character cards."
+   "description": "A kitchen table set up for a game: a laptop running the Shenan-Again Loop Timer showing loop 3 (final) with 00:38 left, an iPad mirroring the timer, a bowl of dice, scattered dice, and handwritten character cards.",
+   "group": "photo_kitchen_table_timer"
   },
   {
    "file": "photo_cat_swiping_dice.jpg",
@@ -477,7 +535,8 @@
    ],
    "ai": false,
    "kind": "photo",
-   "description": "A tabby cat sitting on a chair reaches a paw across the game table to swat a red die. A laptop shows the Loop Timer at 29:15 in loop 2, with character cards and dice on the table."
+   "description": "A tabby cat sitting on a chair reaches a paw across the game table to swat a red die. A laptop shows the Loop Timer at 29:15 in loop 2, with character cards and dice on the table.",
+   "group": "photo_kitchen_table_timer"
   },
   {
    "file": "photo_cat_watching_table.jpg",
@@ -487,7 +546,8 @@
    ],
    "ai": false,
    "kind": "photo",
-   "description": "A tabby cat sits on a chair and eyes the game table: laptop running the Loop Timer at 29:51, an iPad, a bowl, dice, a marker, and handwritten character cards."
+   "description": "A tabby cat sits on a chair and eyes the game table: laptop running the Loop Timer at 29:51, an iPad, a bowl, dice, a marker, and handwritten character cards.",
+   "group": "photo_kitchen_table_timer"
   },
   {
    "file": "photo_cat_looking_at_camera.jpg",
@@ -497,7 +557,8 @@
    ],
    "ai": false,
    "kind": "photo",
-   "description": "A tabby cat sitting on a chair at the game table looks straight at the camera. The laptop shows the Loop Timer at 31:51, with dice and character cards on the table."
+   "description": "A tabby cat sitting on a chair at the game table looks straight at the camera. The laptop shows the Loop Timer at 31:51, with dice and character cards on the table.",
+   "group": "photo_kitchen_table_timer"
   },
   {
    "file": "photo_cat_reaching_timer_warning.jpg",
@@ -507,7 +568,8 @@
    ],
    "ai": false,
    "kind": "photo",
-   "description": "A tabby cat stretches both paws onto the game table toward the dice. On the laptop, the Loop Timer at 33:33 shows a pop-up warning that a marked moment from the last loop, \"Guard leaves their post\", is coming up."
+   "description": "A tabby cat stretches both paws onto the game table toward the dice. On the laptop, the Loop Timer at 33:33 shows a pop-up warning that a marked moment from the last loop, \"Guard leaves their post\", is coming up.",
+   "group": "photo_kitchen_table_timer"
   },
   {
    "file": "photo_cat_reaching_dice.jpg",
@@ -517,7 +579,8 @@
    ],
    "ai": false,
    "kind": "photo",
-   "description": "A tabby cat climbs up with its paws on the edge of the game table, reaching for the dice. The laptop shows the Loop Timer at 34:27."
+   "description": "A tabby cat climbs up with its paws on the edge of the game table, reaching for the dice. The laptop shows the Loop Timer at 34:27.",
+   "group": "photo_kitchen_table_timer"
   },
   {
    "file": "photo_dice_closeup.jpg",
@@ -527,7 +590,8 @@
    ],
    "ai": false,
    "kind": "photo",
-   "description": "Close-up of seven translucent six-sided dice on a dark table: two teal and five red, showing sixes, fives and fours."
+   "description": "Close-up of seven translucent six-sided dice on a dark table: two teal and five red, showing sixes, fives and fours.",
+   "group": "photo_dice_closeup"
   },
   {
    "file": "photo_card_snarky_con.jpg",
@@ -537,7 +601,8 @@
    ],
    "ai": false,
    "kind": "photo",
-   "description": "A handwritten index card on a dark table that reads \"Snarky Con with a Gambling Problem\"."
+   "description": "A handwritten index card on a dark table that reads \"Snarky Con with a Gambling Problem\".",
+   "group": "photo_character_cards"
   },
   {
    "file": "photo_card_sleepy_hacker.jpg",
@@ -547,7 +612,8 @@
    ],
    "ai": false,
    "kind": "photo",
-   "description": "A handwritten index card on a dark table that reads \"Sleepy Hacker with an authority complex\"."
+   "description": "A handwritten index card on a dark table that reads \"Sleepy Hacker with an authority complex\".",
+   "group": "photo_character_cards"
   },
   {
    "file": "photo_card_quiet_muscle.jpg",
@@ -557,7 +623,8 @@
    ],
    "ai": false,
    "kind": "photo",
-   "description": "A handwritten index card on a dark table that reads \"Quiet Muscle with Back Pain\"."
+   "description": "A handwritten index card on a dark table that reads \"Quiet Muscle with Back Pain\".",
+   "group": "photo_character_cards"
   },
   {
    "file": "photo_card_confident_burglar.jpg",
@@ -567,8 +634,9 @@
    ],
    "ai": false,
    "kind": "photo",
-   "description": "A handwritten index card on a dark table that reads \"Confident Burglar with nothing to lose\"."
+   "description": "A handwritten index card on a dark table that reads \"Confident Burglar with nothing to lose\".",
+   "group": "photo_character_cards"
   }
  ],
- "notes": "ai: true means AI-generated art (Instagram posts using it must set isAiGenerated). ai: false means made by people: the scenario maps (map_*) were drawn by people, and photo_* files are real photos with a description of what they show."
+ "notes": "ai: true means AI-generated art (Instagram posts using it must set isAiGenerated). ai: false means made by people: the scenario maps (map_*) were drawn by people, and photo_* files are real photos with a description of what they show. group: images in the same group look basically the same; don't use two from one group in posts close together (a single carousel post may combine them)."
 }
