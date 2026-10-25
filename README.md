@@ -77,7 +77,7 @@ Delete that block once the domain gets its own site.
 ## Social media images
 Caddy also serves the `media/` folder at `https://media.tinytabletops.com/<file>`. These are the game's art,
 resized for Instagram and Bluesky (1080 px wide), and Metricool fetches post images from these URLs.
-`media/index.json` lists every file; each entry says whether it is AI-generated (`"ai": true`) or made by people. To add an image, put it in `media/`, add it to the index, and merge;
+`media/index.json` lists every file; each entry says whether it is AI-generated (`"ai": true`) or made by people, and gives a `"group"` so near-duplicate images aren't posted close together. To add an image, put it in `media/`, add it to the index, and merge;
 the deploy brings it along. The timer image doesn't include this folder (see `.dockerignore`).
 
 ## Automatic deploys
