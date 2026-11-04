@@ -591,7 +591,7 @@
    "ai": false,
    "kind": "photo",
    "description": "Close-up of seven translucent six-sided dice on a dark table: two teal and five red, showing sixes, fives and fours.",
-   "group": "photo_dice_closeup"
+   "group": "photo_dice"
   },
   {
    "file": "photo_card_snarky_con.jpg",
@@ -636,6 +636,17 @@
    "kind": "photo",
    "description": "A handwritten index card on a dark table that reads \"Confident Burglar with nothing to lose\".",
    "group": "photo_character_cards"
+  },
+  {
+   "file": "photo_luck_and_skill_dice.jpg",
+   "size": [
+    1080,
+    1350
+   ],
+   "ai": false,
+   "kind": "photo",
+   "group": "photo_dice",
+   "description": "Twenty teal six-sided dice in four groups of five, with two red dice set apart, on a dark table. Set up as a pool of Luck Dice (teal) and one player's two Skill Dice (red)."
   }
  ],
  "notes": "ai: true means AI-generated art (Instagram posts using it must set isAiGenerated). ai: false means made by people: the scenario maps (map_*) were drawn by people, and photo_* files are real photos with a description of what they show. group: images in the same group look basically the same; don't use two from one group in posts close together (a single carousel post may combine them)."
